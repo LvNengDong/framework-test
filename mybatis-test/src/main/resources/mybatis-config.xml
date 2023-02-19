@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!--SqlSessionFactoryBuilder中配置的配置文件的优先级最高；config.properties配置文件的优先级次之；properties标签中的配置优先级最低 -->
+    <properties resource="org/mybatis/example/config.properties">
+        <property name="username" value="dev_user"/>
+        <property name="password" value="F2Fa3!33TYyg"/>
+    </properties>
+
+    <!--一些重要的全局配置-->
+    <settings>
+        <setting name="cacheEnabled" value="true"/>
+        <!--<setting name="lazyLoadingEnabled" value="true"/>-->
+        <!--<setting name="multipleResultSetsEnabled" value="true"/>-->
+        <!--<setting name="useColumnLabel" value="true"/>-->
+        <!--<setting name="useGeneratedKeys" value="false"/>-->
+        <!--<setting name="autoMappingBehavior" value="PARTIAL"/>-->
+        <!--<setting name="autoMappingUnknownColumnBehavior" value="WARNING"/>-->
+        <!--<setting name="defaultExecutorType" value="SIMPLE"/>-->
+        <!--<setting name="defaultStatementTimeout" value="25"/>-->
+        <!--<setting name="defaultFetchSize" value="100"/>-->
+        <!--<setting name="safeRowBoundsEnabled" value="false"/>-->
+        <!--<setting name="mapUnderscoreToCamelCase" value="false"/>-->
+        <!--<setting name="localCacheScope" value="STATEMENT"/>-->
+        <!--<setting name="jdbcTypeForNull" value="OTHER"/>-->
+        <!--<setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString"/>-->
+        <!--<setting name="logImpl" value="STDOUT_LOGGING" />-->
+    </settings>
+
+    <typeAliases>
+
+    </typeAliases>
+
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!--默认值为 false，当该参数设置为 true 时，如果 pageSize=0 或者 RowBounds.limit = 0 就会查询出全部的结果-->
+            <!--如果某些查询数据量非常大，不应该允许查出所有数据-->
+            <property name="pageSizeZero" value="true"/>
+        </plugin>
+    </plugins>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://10.59.97.10:3308/windty"/>
+                <property name="username" value="windty_opr"/>
+                <property name="password" value="windty!234"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <databaseIdProvider type="DB_VENDOR">
+        <property name="MySQL" value="mysql" />
+        <property name="Oracle" value="oracle" />
+    </databaseIdProvider>
+
+    <mappers>
+        <!--这边可以使用package和resource两种方式加载mapper-->
+        <!--<package name="包名"/>-->
+        <!--<mapper resource="./mappers/SysUserMapper.xml"/>-->
+        <mapper resource="./mappers/CbondissuerMapper.xml"/>
+    </mappers>
+
+</configuration>
