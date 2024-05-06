@@ -3,7 +3,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.1.RELEASE</version>
+    </parent>
     <groupId>cn.lnd</groupId>
     <artifactId>framework-test</artifactId>
     <packaging>pom</packaging>
@@ -14,6 +18,9 @@
         <module>simple-mybatis</module>
         <module>utils</module>
         <module>json</module>
+        <module>es-test</module>
+        <module>mini-spring</module>
+        <module>netty-test</module>
     </modules>
 
     <properties>

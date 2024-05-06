@@ -27,8 +27,8 @@ public class App {
             //执行查询（底层执行JDBC）
             UserMapper mapper = session.getMapper(UserMapper.class);
             System.out.println(mapper.getClass());
-            User user = mapper.selectById(1L);
-            System.out.println(user.getUsername());
+            //User user = mapper.selectById(1L);
+            //System.out.println(user.getUsername());
         }catch (Exception e){
             e.printStackTrace();
         }finally {
