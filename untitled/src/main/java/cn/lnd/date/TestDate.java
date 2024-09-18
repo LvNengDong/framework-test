@@ -2,6 +2,8 @@ package cn.lnd.date;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 
 /**
  * @Author lnd
@@ -10,11 +12,6 @@ import java.time.Period;
  */
 public class TestDate {
     public static void main(String[] args) {
-        String fromDate = "2023-05-19";
-        String toDate = "2023-05-21";
-        LocalDate start = LocalDate.parse(toDate);
-        LocalDate end = LocalDate.parse(fromDate);
-        Period period = Period.between(start, end);
-        System.out.println(period.getDays());
+        System.out.println(new Date());
     }
 }

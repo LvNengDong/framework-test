@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
@@ -48,9 +49,15 @@ public class Test {
         //test.test3();
         //test.test4();
 
-        test.test5();
+        //test.test5();
+        test.test6();
     }
 
+    public void test6() {
+        BigDecimal priceA = new BigDecimal(1);
+        BigDecimal priceB = new BigDecimal(-1);
+        System.out.println(priceA.subtract(priceB));
+    }
     public void test5(){
         String from = "2023-06-05";
         String to = "2023-06-20";

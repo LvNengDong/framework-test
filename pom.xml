@@ -20,6 +20,7 @@
         <module>json</module>
         <module>es-test</module>
         <module>netty-test</module>
+        <module>tomcat-test</module>
     </modules>
 
     <properties>
@@ -47,6 +48,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
             <version>4.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.83</version>
         </dependency>
     </dependencies>
 
