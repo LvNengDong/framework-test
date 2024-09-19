@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 /**
  * @Author lnd
- * @Description
+ * @Description 基础构造器抽象类，为子类提供通用的工具类。
  * @Date 2024/9/18 23:38
  */
 public abstract class BaseBuilder {

@@ -18,8 +18,7 @@ import cn.lnd.ibatis.reflection.MetaClass;
 import cn.lnd.ibatis.reflection.ReflectorFactory;
 import cn.lnd.ibatis.reflection.factory.ObjectFactory;
 import cn.lnd.ibatis.reflection.wrapper.ObjectWrapperFactory;
-import cn.lnd.ibatis.session.Configuration;
-import cn.lnd.ibatis.session.ExecutorType;
+import cn.lnd.ibatis.session.*;
 import cn.lnd.ibatis.transaction.TransactionFactory;
 import cn.lnd.ibatis.type.JdbcType;
 
