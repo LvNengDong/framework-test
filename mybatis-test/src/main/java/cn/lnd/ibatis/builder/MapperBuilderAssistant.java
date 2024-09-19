@@ -1,6 +1,5 @@
 package cn.lnd.ibatis.builder;
 
-import cn.lnd.ibatis.builder.IncompleteElementException;
 import cn.lnd.ibatis.cache.Cache;
 import cn.lnd.ibatis.cache.decorators.LruCache;
 import cn.lnd.ibatis.cache.impl.PerpetualCache;

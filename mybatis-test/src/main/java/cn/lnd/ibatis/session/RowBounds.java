@@ -9,7 +9,7 @@ public class RowBounds {
 
     public static final int NO_ROW_OFFSET = 0;
     public static final int NO_ROW_LIMIT = Integer.MAX_VALUE;
-    public static final org.apache.ibatis.session.RowBounds DEFAULT = new org.apache.ibatis.session.RowBounds();
+    public static final RowBounds DEFAULT = new RowBounds();
 
     private int offset;
     private int limit;

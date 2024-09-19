@@ -4,7 +4,6 @@ import cn.lnd.ibatis.builder.BaseBuilder;
 import cn.lnd.ibatis.builder.BuilderException;
 import cn.lnd.ibatis.builder.CacheRefResolver;
 import cn.lnd.ibatis.builder.MapperBuilderAssistant;
-import cn.lnd.ibatis.builder.xml.XMLStatementBuilder;
 import cn.lnd.ibatis.cache.Cache;
 import cn.lnd.ibatis.executor.ErrorContext;
 import cn.lnd.ibatis.io.Resources;

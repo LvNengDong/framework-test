@@ -4,7 +4,6 @@ import cn.lnd.ibatis.cursor.Cursor;
 import cn.lnd.ibatis.executor.BaseExecutor;
 import cn.lnd.ibatis.executor.BatchResult;
 import cn.lnd.ibatis.executor.ExecutorException;
-import cn.lnd.ibatis.executor.loader.ResultLoader;
 import cn.lnd.ibatis.logging.Log;
 import cn.lnd.ibatis.logging.LogFactory;
 import cn.lnd.ibatis.mapping.BoundSql;

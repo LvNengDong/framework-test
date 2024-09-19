@@ -1,7 +1,5 @@
 package cn.lnd.ibatis.session;
 
-import org.apache.ibatis.session.ResultContext;
-
 /**
  * @Author lnd
  * @Description
