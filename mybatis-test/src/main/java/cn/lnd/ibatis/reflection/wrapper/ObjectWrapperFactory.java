@@ -1,7 +1,6 @@
 package cn.lnd.ibatis.reflection.wrapper;
 
 import cn.lnd.ibatis.reflection.MetaObject;
-import cn.lnd.ibatis.reflection.wrapper.ObjectWrapper;
 
 /**
  * @Author lnd

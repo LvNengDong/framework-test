@@ -1,6 +1,5 @@
 package cn.lnd.ibatis.builder;
 
-import cn.lnd.ibatis.builder.BuilderException;
 import cn.lnd.ibatis.mapping.ParameterMode;
 import cn.lnd.ibatis.mapping.ResultSetType;
 import cn.lnd.ibatis.session.Configuration;

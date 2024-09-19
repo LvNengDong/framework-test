@@ -1,7 +1,5 @@
 package cn.lnd.ibatis.type;
 
-import cn.lnd.ibatis.type.JdbcType;
-
 import java.io.Reader;
 import java.sql.*;
 

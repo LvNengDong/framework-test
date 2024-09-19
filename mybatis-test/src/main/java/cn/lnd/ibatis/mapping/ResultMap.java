@@ -1,8 +1,5 @@
 package cn.lnd.ibatis.mapping;
 
-import cn.lnd.ibatis.mapping.Discriminator;
-import cn.lnd.ibatis.mapping.ResultFlag;
-import cn.lnd.ibatis.mapping.ResultMapping;
 import cn.lnd.ibatis.session.Configuration;
 
 import java.util.*;

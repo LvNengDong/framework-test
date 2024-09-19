@@ -1,6 +1,5 @@
 package cn.lnd.ibatis.mapping;
 
-import cn.lnd.ibatis.mapping.ResultMapping;
 import cn.lnd.ibatis.session.Configuration;
 
 import java.util.Collections;

@@ -1,7 +1,5 @@
 package cn.lnd.ibatis.binding;
 
-import cn.lnd.ibatis.binding.BindingException;
-import cn.lnd.ibatis.binding.MapperProxyFactory;
 import cn.lnd.ibatis.builder.annotation.MapperAnnotationBuilder;
 import cn.lnd.ibatis.io.ResolverUtil;
 import cn.lnd.ibatis.session.Configuration;

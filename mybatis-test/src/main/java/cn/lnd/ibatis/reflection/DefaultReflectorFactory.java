@@ -1,7 +1,5 @@
 package cn.lnd.ibatis.reflection;
 
-import cn.lnd.ibatis.reflection.Reflector;
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 

@@ -2,7 +2,6 @@ package cn.lnd.ibatis.binding;
 
 import cn.lnd.ibatis.annotations.Flush;
 import cn.lnd.ibatis.annotations.MapKey;
-import cn.lnd.ibatis.binding.BindingException;
 import cn.lnd.ibatis.cursor.Cursor;
 import cn.lnd.ibatis.mapping.MappedStatement;
 import cn.lnd.ibatis.mapping.SqlCommandType;

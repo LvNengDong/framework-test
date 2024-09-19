@@ -1,6 +1,5 @@
 package cn.lnd.ibatis.mapping;
 
-import cn.lnd.ibatis.mapping.ParameterMapping;
 import cn.lnd.ibatis.reflection.MetaObject;
 import cn.lnd.ibatis.reflection.property.PropertyTokenizer;
 import cn.lnd.ibatis.session.Configuration;

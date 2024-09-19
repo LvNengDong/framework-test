@@ -1,6 +1,5 @@
 package cn.lnd.ibatis.mapping;
 
-import cn.lnd.ibatis.mapping.ParameterMode;
 import cn.lnd.ibatis.session.Configuration;
 import cn.lnd.ibatis.type.JdbcType;
 import cn.lnd.ibatis.type.TypeHandler;

@@ -1,6 +1,5 @@
 package cn.lnd.ibatis.binding;
 
-import cn.lnd.ibatis.binding.MapperMethod;
 import cn.lnd.ibatis.lang.UsesJava7;
 import cn.lnd.ibatis.reflection.ExceptionUtil;
 import cn.lnd.ibatis.session.SqlSession;

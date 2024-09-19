@@ -1,7 +1,9 @@
 package cn.lnd.ibatis.builder.xml;
 
-import cn.lnd.ibatis.builder.*;
-import cn.lnd.ibatis.builder.xml.XMLMapperEntityResolver;
+import cn.lnd.ibatis.builder.BaseBuilder;
+import cn.lnd.ibatis.builder.BuilderException;
+import cn.lnd.ibatis.builder.CacheRefResolver;
+import cn.lnd.ibatis.builder.MapperBuilderAssistant;
 import cn.lnd.ibatis.builder.xml.XMLStatementBuilder;
 import cn.lnd.ibatis.cache.Cache;
 import cn.lnd.ibatis.executor.ErrorContext;

@@ -6,8 +6,8 @@ package cn.lnd.ibatis.session;
  * @Date 2024/9/18 23:33
  */
 
-import org.apache.ibatis.cursor.Cursor;
-import org.apache.ibatis.executor.BatchResult;
+import cn.lnd.ibatis.cursor.Cursor;
+import cn.lnd.ibatis.executor.BatchResult;
 
 import java.io.Closeable;
 import java.sql.Connection;
@@ -203,7 +203,7 @@ public interface SqlSession extends Closeable {
     /**
      * Flushes batch statements and commits database connection.
      * Note that database connection will not be committed if no updates/deletes/inserts were called.
-     * To force the commit call {@link org.apache.ibatis.session.SqlSession#commit(boolean)}
+     * To force the commit call {@link cn.lnd.ibatis.session.SqlSession#commit(boolean)}
      */
     void commit();
 
@@ -216,7 +216,7 @@ public interface SqlSession extends Closeable {
     /**
      * Discards pending batch statements and rolls database connection back.
      * Note that database connection will not be rolled back if no updates/deletes/inserts were called.
-     * To force the rollback call {@link org.apache.ibatis.session.SqlSession#rollback(boolean)}
+     * To force the rollback call {@link cn.lnd.ibatis.session.SqlSession#rollback(boolean)}
      */
     void rollback();
 

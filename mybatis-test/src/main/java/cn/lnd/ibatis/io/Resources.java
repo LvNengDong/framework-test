@@ -1,7 +1,5 @@
 package cn.lnd.ibatis.io;
 
-import cn.lnd.ibatis.io.ClassLoaderWrapper;
-
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;

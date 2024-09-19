@@ -4,7 +4,6 @@ import cn.lnd.ibatis.transaction.Transaction;
 import cn.lnd.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.session.TransactionIsolationLevel;
 
-
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.Properties;

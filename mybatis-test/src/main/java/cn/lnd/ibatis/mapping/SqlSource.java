@@ -1,7 +1,5 @@
 package cn.lnd.ibatis.mapping;
 
-import cn.lnd.ibatis.mapping.BoundSql;
-
 /**
  * @Author lnd
  * @Description

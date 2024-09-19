@@ -2,7 +2,6 @@ package cn.lnd.ibatis.executor.keygen;
 
 import cn.lnd.ibatis.executor.Executor;
 import cn.lnd.ibatis.executor.ExecutorException;
-import cn.lnd.ibatis.executor.keygen.KeyGenerator;
 import cn.lnd.ibatis.mapping.MappedStatement;
 import cn.lnd.ibatis.reflection.MetaObject;
 import cn.lnd.ibatis.session.Configuration;

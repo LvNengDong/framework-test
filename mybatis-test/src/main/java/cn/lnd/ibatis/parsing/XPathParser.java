@@ -2,7 +2,6 @@ package cn.lnd.ibatis.parsing;
 
 import cn.lnd.ibatis.builder.BuilderException;
 import cn.lnd.ibatis.parsing.PropertyParser;
-import cn.lnd.ibatis.parsing.XNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

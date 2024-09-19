@@ -3,7 +3,6 @@ package cn.lnd.ibatis.reflection;
 import cn.lnd.ibatis.annotations.Param;
 import cn.lnd.ibatis.binding.MapperMethod;
 import cn.lnd.ibatis.io.Resources;
-import cn.lnd.ibatis.reflection.ReflectionException;
 import cn.lnd.ibatis.session.Configuration;
 import cn.lnd.ibatis.session.ResultHandler;
 import cn.lnd.ibatis.session.RowBounds;

@@ -1,7 +1,5 @@
 package cn.lnd.ibatis.io;
 
-import cn.lnd.ibatis.io.DefaultVFS;
-import cn.lnd.ibatis.io.JBoss6VFS;
 import cn.lnd.ibatis.logging.Log;
 import cn.lnd.ibatis.logging.LogFactory;
 

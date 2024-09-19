@@ -1,6 +1,5 @@
 package cn.lnd.ibatis.builder;
 
-import cn.lnd.ibatis.builder.MapperBuilderAssistant;
 import cn.lnd.ibatis.cache.Cache;
 
 /**

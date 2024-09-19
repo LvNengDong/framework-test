@@ -1,7 +1,6 @@
 package cn.lnd.ibatis.executor.keygen;
 
 import cn.lnd.ibatis.executor.Executor;
-import cn.lnd.ibatis.executor.keygen.KeyGenerator;
 import cn.lnd.ibatis.mapping.MappedStatement;
 
 import java.sql.Statement;

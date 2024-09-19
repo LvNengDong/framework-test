@@ -2,7 +2,6 @@ package cn.lnd.ibatis.logging.log4j2;
 
 
 import cn.lnd.ibatis.logging.Log;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.spi.AbstractLogger;

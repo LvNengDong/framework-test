@@ -15,10 +15,12 @@ import java.util.List;
  * @Description
  * @Date 2024/9/19 11:37
  */
-public class JBoss6VFS extends VFS{
+public class JBoss6VFS extends VFS {
     private static final Log log = LogFactory.getLog(cn.lnd.ibatis.io.JBoss6VFS.class);
 
-    /** A class that mimics a tiny subset of the JBoss VirtualFile class. */
+    /**
+     * A class that mimics a tiny subset of the JBoss VirtualFile class.
+     */
     static class VirtualFile {
         static Class<?> VirtualFile;
         static Method getPathNameRelativeTo, getChildrenRecursively;
@@ -49,7 +51,9 @@ public class JBoss6VFS extends VFS{
         }
     }
 
-    /** A class that mimics a tiny subset of the JBoss VFS class. */
+    /**
+     * A class that mimics a tiny subset of the JBoss VFS class.
+     */
     static class VFS {
         static Class<?> VFS;
         static Method getChild;
@@ -64,10 +68,14 @@ public class JBoss6VFS extends VFS{
         }
     }
 
-    /** Flag that indicates if this VFS is valid for the current environment. */
+    /**
+     * Flag that indicates if this VFS is valid for the current environment.
+     */
     private static Boolean valid;
 
-    /** Find all the classes and methods that are required to access the JBoss 6 VFS. */
+    /**
+     * Find all the classes and methods that are required to access the JBoss 6 VFS.
+     */
     protected static synchronized void initialize() {
         if (valid == null) {
             // Assume valid. It will get flipped later if something goes wrong.
@@ -108,7 +116,7 @@ public class JBoss6VFS extends VFS{
      * Verifies that the return type of a method is what it is expected to be. If it is not, then
      * this VFS is marked as invalid for the current environment.
      *
-     * @param method The method whose return type is to be checked.
+     * @param method   The method whose return type is to be checked.
      * @param expected A type to which the method's return type must be assignable.
      * @see Class#isAssignableFrom(Class)
      */
@@ -121,7 +129,9 @@ public class JBoss6VFS extends VFS{
         }
     }
 
-    /** Mark this {@link cn.lnd.ibatis.io.JBoss6VFS.VFS} as invalid for the current environment. */
+    /**
+     * Mark this {@link cn.lnd.ibatis.io.JBoss6VFS.VFS} as invalid for the current environment.
+     */
     protected static void setInvalid() {
         if (cn.lnd.ibatis.io.JBoss6VFS.valid == Boolean.TRUE) {
             log.debug("JBoss 6 VFS API is not available in this environment.");

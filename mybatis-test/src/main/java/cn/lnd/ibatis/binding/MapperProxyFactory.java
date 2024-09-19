@@ -1,7 +1,5 @@
 package cn.lnd.ibatis.binding;
 
-import cn.lnd.ibatis.binding.MapperMethod;
-import cn.lnd.ibatis.binding.MapperProxy;
 import cn.lnd.ibatis.session.SqlSession;
 
 import java.lang.reflect.Method;

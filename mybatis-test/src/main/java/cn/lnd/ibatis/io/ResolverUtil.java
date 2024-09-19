@@ -1,6 +1,5 @@
 package cn.lnd.ibatis.io;
 
-import cn.lnd.ibatis.io.VFS;
 import cn.lnd.ibatis.logging.Log;
 import cn.lnd.ibatis.logging.LogFactory;
 

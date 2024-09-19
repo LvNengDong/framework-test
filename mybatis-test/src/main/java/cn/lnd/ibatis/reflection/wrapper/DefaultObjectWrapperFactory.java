@@ -2,8 +2,6 @@ package cn.lnd.ibatis.reflection.wrapper;
 
 import cn.lnd.ibatis.reflection.MetaObject;
 import cn.lnd.ibatis.reflection.ReflectionException;
-import cn.lnd.ibatis.reflection.wrapper.ObjectWrapper;
-import cn.lnd.ibatis.reflection.wrapper.ObjectWrapperFactory;
 
 /**
  * @Author lnd

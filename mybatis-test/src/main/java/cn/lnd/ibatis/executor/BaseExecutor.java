@@ -3,8 +3,6 @@ package cn.lnd.ibatis.executor;
 import cn.lnd.ibatis.cache.CacheKey;
 import cn.lnd.ibatis.cache.impl.PerpetualCache;
 import cn.lnd.ibatis.cursor.Cursor;
-import cn.lnd.ibatis.executor.*;
-import cn.lnd.ibatis.executor.ErrorContext;
 import cn.lnd.ibatis.executor.statement.StatementUtil;
 import cn.lnd.ibatis.logging.Log;
 import cn.lnd.ibatis.logging.LogFactory;

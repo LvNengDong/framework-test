@@ -1,6 +1,5 @@
 package cn.lnd.ibatis.executor.loader;
 
-import cn.lnd.ibatis.executor.loader.ResultLoaderMap;
 import cn.lnd.ibatis.reflection.factory.ObjectFactory;
 import cn.lnd.ibatis.session.Configuration;
 

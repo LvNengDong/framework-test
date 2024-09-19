@@ -1,10 +1,9 @@
 package cn.lnd.ibatis.reflection;
 
-import cn.lnd.ibatis.reflection.ReflectorFactory;
-import cn.lnd.ibatis.reflection.SystemMetaObject;
 import cn.lnd.ibatis.reflection.factory.ObjectFactory;
 import cn.lnd.ibatis.reflection.property.PropertyTokenizer;
-import cn.lnd.ibatis.reflection.wrapper.*;
+import cn.lnd.ibatis.reflection.wrapper.ObjectWrapper;
+import cn.lnd.ibatis.reflection.wrapper.ObjectWrapperFactory;
 
 import java.util.Collection;
 import java.util.List;

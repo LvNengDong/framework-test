@@ -2,7 +2,6 @@ package cn.lnd.ibatis.executor;
 
 import cn.lnd.ibatis.cache.CacheKey;
 import cn.lnd.ibatis.cursor.Cursor;
-import cn.lnd.ibatis.executor.BatchResult;
 import cn.lnd.ibatis.mapping.BoundSql;
 import cn.lnd.ibatis.mapping.MappedStatement;
 import cn.lnd.ibatis.reflection.MetaObject;

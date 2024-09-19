@@ -1,9 +1,9 @@
 package cn.lnd.ibatis.reflection;
 
-import cn.lnd.ibatis.reflection.invoker.SetFieldInvoker;
 import cn.lnd.ibatis.reflection.invoker.GetFieldInvoker;
 import cn.lnd.ibatis.reflection.invoker.Invoker;
 import cn.lnd.ibatis.reflection.invoker.MethodInvoker;
+import cn.lnd.ibatis.reflection.invoker.SetFieldInvoker;
 import cn.lnd.ibatis.reflection.property.PropertyNamer;
 import lombok.Data;
 
