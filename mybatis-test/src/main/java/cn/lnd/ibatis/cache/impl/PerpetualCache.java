@@ -10,17 +10,20 @@ import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  * @Author lnd
- * @Description 实现 Cache 接口，永不过期的 Cache 实现类，基于 HashMap 实现
- *
+ * @Description
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ *      1、实现 Cache 接口，永不过期的 Cache 实现类，基于 HashMap 实现
+ *      2、实现了 Cache 接口缓存数据的基本能力，除了 PerpetualCache 之外的其他所有 Cache 接口实现类，都是装饰器实现
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
  * @Date 2024/9/18 17:06
  */
 public class PerpetualCache implements Cache {
 
-    // 标识
+    // 缓存对象的唯一标识
     private String id;
 
     // 缓存容器
-    private Map<Object, Object> cache = new HashMap<Object, Object>();
+    private Map<Object, Object> cache = new HashMap<>();
 
     public PerpetualCache(String id) {
         this.id = id;
@@ -86,9 +89,3 @@ public class PerpetualCache implements Cache {
     }
 
 }
-
-/*
-    delegate 属性，被装饰的 Cache 对象。
-
-    在 #getObject(Object key) 方法，增加了 requests 和 hits 的计数，从而实现命中比率的统计，即 #getHitRatio() 方法。
- */

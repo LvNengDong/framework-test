@@ -1,4 +1,4 @@
-package cn.lnd.ibatis.reflection.factory;
+package cn.lnd.ibatis.reflection;
 
 import cn.lnd.ibatis.reflection.Reflector;
 

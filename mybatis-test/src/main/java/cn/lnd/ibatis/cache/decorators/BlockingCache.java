@@ -22,8 +22,10 @@ public class BlockingCache implements Cache {
 
     // 阻塞等待超时时间
     private long timeout;
-    // 装饰的 Cache 对象
+
+    // 被装饰的 Cache 对象
     private final Cache delegate;
+
     // 缓存键与 ReentrantLock 锁对象的映射
     private final ConcurrentHashMap<Object, ReentrantLock> locks;
 

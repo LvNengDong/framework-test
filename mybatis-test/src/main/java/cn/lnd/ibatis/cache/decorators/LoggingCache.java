@@ -16,7 +16,7 @@ public class LoggingCache implements Cache {
 
     // MyBatis Log 对象
     private Log log;
-    // 装饰的 Cache 对象
+    // 被装饰的 Cache 对象
     private Cache delegate;
     // 统计请求缓存的次数
     protected int requests = 0;
@@ -89,3 +89,8 @@ public class LoggingCache implements Cache {
     }
 
 }
+
+/*
+    delegate 属性，被装饰的 Cache 对象。
+    在 #getObject(Object key) 方法，增加了 requests 和 hits 的计数，从而实现命中比率的统计，即 #getHitRatio() 方法。
+ */

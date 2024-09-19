@@ -1,6 +1,6 @@
 package cn.lnd.ibatis.type;
 
-import org.apache.ibatis.type.JdbcType;
+import cn.lnd.ibatis.type.JdbcType;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;

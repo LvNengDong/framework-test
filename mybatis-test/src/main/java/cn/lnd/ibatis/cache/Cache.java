@@ -10,7 +10,9 @@ import java.util.concurrent.locks.ReadWriteLock;
 public interface Cache {
 
     /**
-     * @return The identifier of this cache 标识
+     * @return The identifier of this cache
+     *
+     * 返回此缓存对象的唯一标识
      */
     String getId();
 
