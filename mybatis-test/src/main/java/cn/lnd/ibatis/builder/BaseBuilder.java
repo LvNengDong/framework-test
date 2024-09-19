@@ -1,13 +1,13 @@
 package cn.lnd.ibatis.builder;
 
-import org.apache.ibatis.builder.BuilderException;
-import org.apache.ibatis.mapping.ParameterMode;
-import org.apache.ibatis.mapping.ResultSetType;
-import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.type.JdbcType;
-import org.apache.ibatis.type.TypeAliasRegistry;
-import org.apache.ibatis.type.TypeHandler;
-import org.apache.ibatis.type.TypeHandlerRegistry;
+import cn.lnd.ibatis.builder.BuilderException;
+import cn.lnd.ibatis.mapping.ParameterMode;
+import cn.lnd.ibatis.mapping.ResultSetType;
+import cn.lnd.ibatis.session.Configuration;
+import cn.lnd.ibatis.type.JdbcType;
+import cn.lnd.ibatis.type.TypeAliasRegistry;
+import cn.lnd.ibatis.type.TypeHandler;
+import cn.lnd.ibatis.type.TypeHandlerRegistry;
 
 import java.util.Arrays;
 import java.util.HashSet;

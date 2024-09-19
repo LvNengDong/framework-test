@@ -1,7 +1,5 @@
 package cn.lnd.ibatis.type;
 
-import cn.lnd.ibatis.type.TypeException;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 

@@ -15,15 +15,15 @@ public class ParameterMap {
 
     private String id;
     private Class<?> type;
-    private List<cn.lnd.ibatis.mapping.ParameterMapping> parameterMappings;
+    private List<ParameterMapping> parameterMappings;
 
     private ParameterMap() {
     }
 
     public static class Builder {
-        private cn.lnd.ibatis.mapping.ParameterMap parameterMap = new cn.lnd.ibatis.mapping.ParameterMap();
+        private cn.lnd.ibatis.mapping.ParameterMap parameterMap = new ParameterMap();
 
-        public Builder(Configuration configuration, String id, Class<?> type, List<cn.lnd.ibatis.mapping.ParameterMapping> parameterMappings) {
+        public Builder(Configuration configuration, String id, Class<?> type, List<ParameterMapping> parameterMappings) {
             parameterMap.id = id;
             parameterMap.type = type;
             parameterMap.parameterMappings = parameterMappings;

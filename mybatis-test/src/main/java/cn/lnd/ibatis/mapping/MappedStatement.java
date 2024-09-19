@@ -6,7 +6,6 @@ import cn.lnd.ibatis.executor.keygen.KeyGenerator;
 import cn.lnd.ibatis.executor.keygen.NoKeyGenerator;
 import cn.lnd.ibatis.logging.Log;
 import cn.lnd.ibatis.logging.LogFactory;
-import cn.lnd.ibatis.mapping.*;
 import cn.lnd.ibatis.scripting.LanguageDriver;
 import cn.lnd.ibatis.session.Configuration;
 
@@ -50,7 +49,7 @@ public class MappedStatement {
     }
 
     public static class Builder {
-        private cn.lnd.ibatis.mapping.MappedStatement mappedStatement = new cn.lnd.ibatis.mapping.MappedStatement();
+        private MappedStatement mappedStatement = new MappedStatement();
 
         public Builder(Configuration configuration, String id, SqlSource sqlSource, SqlCommandType sqlCommandType) {
             mappedStatement.configuration = configuration;
@@ -69,7 +68,7 @@ public class MappedStatement {
             mappedStatement.lang = configuration.getDefaultScriptingLanguageInstance();
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder resource(String resource) {
+        public MappedStatement.Builder resource(String resource) {
             mappedStatement.resource = resource;
             return this;
         }
@@ -78,12 +77,12 @@ public class MappedStatement {
             return mappedStatement.id;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder parameterMap(ParameterMap parameterMap) {
+        public MappedStatement.Builder parameterMap(ParameterMap parameterMap) {
             mappedStatement.parameterMap = parameterMap;
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder resultMaps(List<ResultMap> resultMaps) {
+        public MappedStatement.Builder resultMaps(List<ResultMap> resultMaps) {
             mappedStatement.resultMaps = resultMaps;
             for (ResultMap resultMap : resultMaps) {
                 mappedStatement.hasNestedResultMaps = mappedStatement.hasNestedResultMaps || resultMap.hasNestedResultMaps();
@@ -91,84 +90,84 @@ public class MappedStatement {
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder fetchSize(Integer fetchSize) {
+        public MappedStatement.Builder fetchSize(Integer fetchSize) {
             mappedStatement.fetchSize = fetchSize;
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder timeout(Integer timeout) {
+        public MappedStatement.Builder timeout(Integer timeout) {
             mappedStatement.timeout = timeout;
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder statementType(StatementType statementType) {
+        public MappedStatement.Builder statementType(StatementType statementType) {
             mappedStatement.statementType = statementType;
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder resultSetType(ResultSetType resultSetType) {
+        public MappedStatement.Builder resultSetType(ResultSetType resultSetType) {
             mappedStatement.resultSetType = resultSetType;
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder cache(Cache cache) {
+        public MappedStatement.Builder cache(Cache cache) {
             mappedStatement.cache = cache;
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder flushCacheRequired(boolean flushCacheRequired) {
+        public MappedStatement.Builder flushCacheRequired(boolean flushCacheRequired) {
             mappedStatement.flushCacheRequired = flushCacheRequired;
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder useCache(boolean useCache) {
+        public MappedStatement.Builder useCache(boolean useCache) {
             mappedStatement.useCache = useCache;
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder resultOrdered(boolean resultOrdered) {
+        public MappedStatement.Builder resultOrdered(boolean resultOrdered) {
             mappedStatement.resultOrdered = resultOrdered;
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder keyGenerator(KeyGenerator keyGenerator) {
+        public MappedStatement.Builder keyGenerator(KeyGenerator keyGenerator) {
             mappedStatement.keyGenerator = keyGenerator;
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder keyProperty(String keyProperty) {
+        public MappedStatement.Builder keyProperty(String keyProperty) {
             mappedStatement.keyProperties = delimitedStringToArray(keyProperty);
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder keyColumn(String keyColumn) {
+        public MappedStatement.Builder keyColumn(String keyColumn) {
             mappedStatement.keyColumns = delimitedStringToArray(keyColumn);
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder databaseId(String databaseId) {
+        public MappedStatement.Builder databaseId(String databaseId) {
             mappedStatement.databaseId = databaseId;
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder lang(LanguageDriver driver) {
+        public MappedStatement.Builder lang(LanguageDriver driver) {
             mappedStatement.lang = driver;
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder resultSets(String resultSet) {
+        public MappedStatement.Builder resultSets(String resultSet) {
             mappedStatement.resultSets = delimitedStringToArray(resultSet);
             return this;
         }
 
         /** @deprecated Use {@link #resultSets} */
         @Deprecated
-        public cn.lnd.ibatis.mapping.MappedStatement.Builder resulSets(String resultSet) {
+        public MappedStatement.Builder resulSets(String resultSet) {
             mappedStatement.resultSets = delimitedStringToArray(resultSet);
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.MappedStatement build() {
+        public MappedStatement build() {
             assert mappedStatement.configuration != null;
             assert mappedStatement.id != null;
             assert mappedStatement.sqlSource != null;
