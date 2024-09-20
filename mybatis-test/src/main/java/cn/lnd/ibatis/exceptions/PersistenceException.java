@@ -3,7 +3,7 @@ package cn.lnd.ibatis.exceptions;
 
 /**
  * @Author lnd
- * @Description
+ * @Description 继承 IbatisException 类，目前 MyBatis 真正的异常基类
  * @Date 2024/9/18 21:54
  */
 public class PersistenceException extends IbatisException {
