@@ -14,39 +14,61 @@ import java.util.Map;
 
 /**
  * @Author lnd
- * @Description
+ * @Description 实现 InvocationHandler、Serializable 接口，Mapper Proxy 。关键是 java.lang.reflect.InvocationHandler 接口，你懂的。
  * @Date 2024/9/19 15:06
  */
 public class MapperProxy<T> implements InvocationHandler, Serializable {
 
     private static final long serialVersionUID = -6424540398559729838L;
-    private final SqlSession sqlSession;
-    private final Class<T> mapperInterface;
-    private final Map<Method, cn.lnd.ibatis.binding.MapperMethod> methodCache;
 
-    public MapperProxy(SqlSession sqlSession, Class<T> mapperInterface, Map<Method, cn.lnd.ibatis.binding.MapperMethod> methodCache) {
+    /** SqlSession 对象 */
+    private final SqlSession sqlSession;
+
+    /** Mapper 接口 */
+    private final Class<T> mapperInterface;
+
+    /**
+     * 方法与 MapperMethod 的映射
+     * 从 {@link MapperProxyFactory#methodCache} 传递过来
+     * */
+    private final Map<Method, MapperMethod> methodCache;
+
+    public MapperProxy(SqlSession sqlSession, Class<T> mapperInterface, Map<Method, MapperMethod> methodCache) {
         this.sqlSession = sqlSession;
         this.mapperInterface = mapperInterface;
         this.methodCache = methodCache;
     }
 
+    /**
+     * 代理方法
+     * */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         try {
+            // <1> 如果是 Object 定义的方法，直接调用
             if (Object.class.equals(method.getDeclaringClass())) {
                 return method.invoke(this, args);
-            } else if (isDefaultMethod(method)) {
+            }
+            // 见 https://github.com/mybatis/mybatis-3/issues/709 ，支持 JDK8 default 方法
+            else if (isDefaultMethod(method)) {
+                /* JDK8 在接口上，新增了 default 修饰符。怎么进行反射调用，见 《java8 通过反射执行接口的default方法》 一文。（https://www.jianshu.com/p/63691220f81f） */
                 return invokeDefaultMethod(proxy, method, args);
             }
         } catch (Throwable t) {
             throw ExceptionUtil.unwrapThrowable(t);
         }
-        final cn.lnd.ibatis.binding.MapperMethod mapperMethod = cachedMapperMethod(method);
+        // <3.1> 获得 MapperMethod 对象
+        final MapperMethod mapperMethod = cachedMapperMethod(method);
+        // <3.2> 执行 MapperMethod 方法
         return mapperMethod.execute(sqlSession, args);
     }
 
-    private cn.lnd.ibatis.binding.MapperMethod cachedMapperMethod(Method method) {
-        cn.lnd.ibatis.binding.MapperMethod mapperMethod = methodCache.get(method);
+    /**
+     * 获得 MapperMethod 对象
+     * 默认从 methodCache 缓存中获取。如果不存在，则进行创建，并进行缓存。
+     * */
+    private MapperMethod cachedMapperMethod(Method method) {
+        MapperMethod mapperMethod = methodCache.get(method);
         if (mapperMethod == null) {
             mapperMethod = new MapperMethod(mapperInterface, method, sqlSession.getConfiguration());
             methodCache.put(method, mapperMethod);
@@ -68,7 +90,7 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
     }
 
     /**
-     * Backport of java.lang.reflect.Method#isDefault()
+     * 判断是否为 default 修饰的方法
      */
     private boolean isDefaultMethod(Method method) {
         return ((method.getModifiers()

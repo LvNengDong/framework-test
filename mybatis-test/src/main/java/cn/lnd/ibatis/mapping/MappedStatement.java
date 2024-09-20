@@ -8,6 +8,7 @@ import cn.lnd.ibatis.logging.Log;
 import cn.lnd.ibatis.logging.LogFactory;
 import cn.lnd.ibatis.scripting.LanguageDriver;
 import cn.lnd.ibatis.session.Configuration;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,28 +21,49 @@ import java.util.List;
  */
 public class MappedStatement {
 
+    @Getter
     private String resource;
+    @Getter
     private Configuration configuration;
+    @Getter
     private String id;
+    @Getter
     private Integer fetchSize;
+    @Getter
     private Integer timeout;
+    @Getter
     private StatementType statementType;
+    @Getter
     private ResultSetType resultSetType;
     private SqlSource sqlSource;
+    @Getter
     private Cache cache;
+    @Getter
     private ParameterMap parameterMap;
+    @Getter
     private List<ResultMap> resultMaps;
+    @Getter
     private boolean flushCacheRequired;
+    @Getter
     private boolean useCache;
+    @Getter
     private boolean resultOrdered;
+    @Getter
     private SqlCommandType sqlCommandType;
+    @Getter
     private KeyGenerator keyGenerator;
+    @Getter
     private String[] keyProperties;
+    @Getter
     private String[] keyColumns;
     private boolean hasNestedResultMaps;
+    @Getter
     private String databaseId;
+    @Getter
     private Log statementLog;
+    @Getter
     private LanguageDriver lang;
+    @Getter
     private String[] resultSets;
 
     MappedStatement() {
@@ -177,96 +199,12 @@ public class MappedStatement {
         }
     }
 
-    public KeyGenerator getKeyGenerator() {
-        return keyGenerator;
-    }
-
-    public SqlCommandType getSqlCommandType() {
-        return sqlCommandType;
-    }
-
-    public String getResource() {
-        return resource;
-    }
-
-    public Configuration getConfiguration() {
-        return configuration;
-    }
-
-    public String getId() {
-        return id;
-    }
-
     public boolean hasNestedResultMaps() {
         return hasNestedResultMaps;
     }
 
-    public Integer getFetchSize() {
-        return fetchSize;
-    }
-
-    public Integer getTimeout() {
-        return timeout;
-    }
-
-    public StatementType getStatementType() {
-        return statementType;
-    }
-
-    public ResultSetType getResultSetType() {
-        return resultSetType;
-    }
-
     public SqlSource getSqlSource() {
         return sqlSource;
-    }
-
-    public ParameterMap getParameterMap() {
-        return parameterMap;
-    }
-
-    public List<ResultMap> getResultMaps() {
-        return resultMaps;
-    }
-
-    public Cache getCache() {
-        return cache;
-    }
-
-    public boolean isFlushCacheRequired() {
-        return flushCacheRequired;
-    }
-
-    public boolean isUseCache() {
-        return useCache;
-    }
-
-    public boolean isResultOrdered() {
-        return resultOrdered;
-    }
-
-    public String getDatabaseId() {
-        return databaseId;
-    }
-
-    public String[] getKeyProperties() {
-        return keyProperties;
-    }
-
-    public String[] getKeyColumns() {
-        return keyColumns;
-    }
-
-    public Log getStatementLog() {
-        return statementLog;
-    }
-
-    public LanguageDriver getLang() {
-        return lang;
-    }
-
-    public String[] getResultSets() {
-        return resultSets;
     }
 
     /** @deprecated Use {@link #getResultSets()} */
@@ -297,7 +235,7 @@ public class MappedStatement {
     }
 
     private static String[] delimitedStringToArray(String in) {
-        if (in == null || in.trim().length() == 0) {
+        if (in == null || in.trim().isEmpty()) {
             return null;
         } else {
             return in.split(",");
