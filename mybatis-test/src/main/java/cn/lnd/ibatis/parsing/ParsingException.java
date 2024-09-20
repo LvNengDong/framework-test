@@ -1,6 +1,6 @@
 package cn.lnd.ibatis.parsing;
 
-import org.apache.ibatis.exceptions.PersistenceException;
+import cn.lnd.ibatis.exceptions.PersistenceException;
 
 /**
  * @Author lnd
