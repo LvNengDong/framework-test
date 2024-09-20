@@ -12,15 +12,18 @@ import java.util.Set;
 /**
  * @Author lnd
  * @Description
+ *      解析器工具类，用于获得指定目录符合条件的类们
  * @Date 2024/9/19 11:35
  */
 public class ResolverUtil<T> {
     /*
      * An instance of Log to use for logging in this class.
      */
-    private static final Log log = LogFactory.getLog(cn.lnd.ibatis.io.ResolverUtil.class);
+    private static final Log log = LogFactory.getLog(ResolverUtil.class);
 
     /**
+     * 匹配判断接口
+     *
      * A simple interface that specifies how to test classes to determine if they
      * are to be included in the results produced by the ResolverUtil.
      */
@@ -33,10 +36,13 @@ public class ResolverUtil<T> {
     }
 
     /**
+     * IsA ，实现 Test 接口，判断是否为指定类
+     * 
      * A Test that checks to see if each class is assignable to the provided class. Note
      * that this test will match the parent type itself if it is presented for matching.
      */
-    public static class IsA implements cn.lnd.ibatis.io.ResolverUtil.Test {
+    public static class IsA implements ResolverUtil.Test {
+        // 指定类
         private Class<?> parent;
 
         /** Constructs an IsA test using the supplied Class as the parent class/interface. */
@@ -57,10 +63,13 @@ public class ResolverUtil<T> {
     }
 
     /**
+     * AnnotatedWith ，判断是否有指定注解。
+     *
      * A Test that checks to see if each class is annotated with a specific annotation. If it
      * is, then the test returns true, otherwise false.
      */
-    public static class AnnotatedWith implements cn.lnd.ibatis.io.ResolverUtil.Test {
+    public static class AnnotatedWith implements ResolverUtil.Test {
+        // 注解
         private Class<? extends Annotation> annotation;
 
         /** Constructs an AnnotatedWith test for the specified annotation type. */
@@ -81,7 +90,7 @@ public class ResolverUtil<T> {
     }
 
     /** The set of matches being accumulated. */
-    private Set<Class<? extends T>> matches = new HashSet<Class<? extends T>>();
+    private Set<Class<? extends T>> matches = new HashSet<Class<? extends T>>(); // 符合条件的类的集合
 
     /**
      * The ClassLoader to use when looking for classes. If null then the ClassLoader returned
@@ -120,6 +129,8 @@ public class ResolverUtil<T> {
     }
 
     /**
+     * 判断指定目录下们，符合指定类的类们
+     *
      * Attempts to discover classes that are assignable to the type provided. In the case
      * that an interface is provided this method will collect implementations. In the case
      * of a non-interface class, subclasses will be collected.  Accumulated classes can be
@@ -128,12 +139,12 @@ public class ResolverUtil<T> {
      * @param parent the class of interface to find subclasses or implementations of
      * @param packageNames one or more package names to scan (including subpackages) for classes
      */
-    public cn.lnd.ibatis.io.ResolverUtil<T> findImplementations(Class<?> parent, String... packageNames) {
+    public ResolverUtil<T> findImplementations(Class<?> parent, String... packageNames) {
         if (packageNames == null) {
             return this;
         }
 
-        cn.lnd.ibatis.io.ResolverUtil.Test test = new cn.lnd.ibatis.io.ResolverUtil.IsA(parent);
+        ResolverUtil.Test test = new ResolverUtil.IsA(parent);
         for (String pkg : packageNames) {
             find(test, pkg);
         }
@@ -142,18 +153,20 @@ public class ResolverUtil<T> {
     }
 
     /**
+     * 判断指定目录下们，符合指定注解的类们。
+     *
      * Attempts to discover classes that are annotated with the annotation. Accumulated
      * classes can be accessed by calling {@link #getClasses()}.
      *
      * @param annotation the annotation that should be present on matching classes
      * @param packageNames one or more package names to scan (including subpackages) for classes
      */
-    public cn.lnd.ibatis.io.ResolverUtil<T> findAnnotated(Class<? extends Annotation> annotation, String... packageNames) {
+    public ResolverUtil<T> findAnnotated(Class<? extends Annotation> annotation, String... packageNames) {
         if (packageNames == null) {
             return this;
         }
 
-        cn.lnd.ibatis.io.ResolverUtil.Test test = new cn.lnd.ibatis.io.ResolverUtil.AnnotatedWith(annotation);
+        ResolverUtil.Test test = new ResolverUtil.AnnotatedWith(annotation);
         for (String pkg : packageNames) {
             find(test, pkg);
         }
@@ -162,22 +175,28 @@ public class ResolverUtil<T> {
     }
 
     /**
+     * 获得指定包下，符合条件的类
+     *
      * Scans for classes starting at the package provided and descending into subpackages.
      * Each class is offered up to the Test as it is discovered, and if the Test returns
      * true the class is retained.  Accumulated classes can be fetched by calling
      * {@link #getClasses()}.
      *
-     * @param test an instance of {@link cn.lnd.ibatis.io.ResolverUtil.Test} that will be used to filter classes
+     * @param test an instance of {@link ResolverUtil.Test} that will be used to filter classes
      * @param packageName the name of the package from which to start scanning for
      *        classes, e.g. {@code net.sourceforge.stripes}
      */
-    public cn.lnd.ibatis.io.ResolverUtil<T> find(cn.lnd.ibatis.io.ResolverUtil.Test test, String packageName) {
+    public ResolverUtil<T> find(ResolverUtil.Test test, String packageName) {
+        // <1> 获得包的路径
         String path = getPackagePath(packageName);
-
         try {
+            // <2> 获得路径下的所有文件
             List<String> children = VFS.getInstance().list(path);
+            // <3> 遍历
             for (String child : children) {
+                // 是 Java Class
                 if (child.endsWith(".class")) {
+                    // 如果匹配，则添加到结果集
                     addIfMatching(test, child);
                 }
             }
@@ -206,15 +225,18 @@ public class ResolverUtil<T> {
      * @param fqn the fully qualified name of a class
      */
     @SuppressWarnings("unchecked")
-    protected void addIfMatching(cn.lnd.ibatis.io.ResolverUtil.Test test, String fqn) {
+    protected void addIfMatching(ResolverUtil.Test test, String fqn) {
         try {
+            // 获得全类名
             String externalName = fqn.substring(0, fqn.indexOf('.')).replace('/', '.');
             ClassLoader loader = getClassLoader();
             if (log.isDebugEnabled()) {
                 log.debug("Checking to see if class " + externalName + " matches criteria [" + test + "]");
             }
-
+            // 加载类
             Class<?> type = loader.loadClass(externalName);
+
+            // 判断是否匹配
             if (test.matches(type)) {
                 matches.add((Class<T>) type);
             }

@@ -12,11 +12,19 @@ import java.util.List;
 
 /**
  * @Author lnd
- * @Description
+ * @Description 继承 VFS 抽象类，基于 JBoss 的 VFS 实现类。使用时，需要引入如下
+     * <dependency>
+     *     <groupId>org.jboss</groupId>
+     *     <artifactId>jboss-vfs</artifactId>
+     *     <version>${version></version>
+     * </dependency>
+ *
+ *  因为实际基本没使用到，所以暂时不分析这个类。感兴趣的胖友，可以自己瞅瞅。还是简单的。反正艿艿暂时不感兴趣，哈哈哈。
+ *
  * @Date 2024/9/19 11:37
  */
 public class JBoss6VFS extends VFS {
-    private static final Log log = LogFactory.getLog(cn.lnd.ibatis.io.JBoss6VFS.class);
+    private static final Log log = LogFactory.getLog(JBoss6VFS.class);
 
     /**
      * A class that mimics a tiny subset of the JBoss VirtualFile class.
@@ -31,7 +39,7 @@ public class JBoss6VFS extends VFS {
             this.virtualFile = virtualFile;
         }
 
-        String getPathNameRelativeTo(cn.lnd.ibatis.io.JBoss6VFS.VirtualFile parent) {
+        String getPathNameRelativeTo(JBoss6VFS.VirtualFile parent) {
             try {
                 return invoke(getPathNameRelativeTo, virtualFile, parent.virtualFile);
             } catch (IOException e) {
@@ -41,11 +49,11 @@ public class JBoss6VFS extends VFS {
             }
         }
 
-        List<cn.lnd.ibatis.io.JBoss6VFS.VirtualFile> getChildren() throws IOException {
+        List<JBoss6VFS.VirtualFile> getChildren() throws IOException {
             List<?> objects = invoke(getChildrenRecursively, virtualFile);
-            List<cn.lnd.ibatis.io.JBoss6VFS.VirtualFile> children = new ArrayList<cn.lnd.ibatis.io.JBoss6VFS.VirtualFile>(objects.size());
+            List<JBoss6VFS.VirtualFile> children = new ArrayList<JBoss6VFS.VirtualFile>(objects.size());
             for (Object object : objects) {
-                children.add(new cn.lnd.ibatis.io.JBoss6VFS.VirtualFile(object));
+                children.add(new JBoss6VFS.VirtualFile(object));
             }
             return children;
         }
@@ -62,9 +70,9 @@ public class JBoss6VFS extends VFS {
             // Prevent Instantiation
         }
 
-        static cn.lnd.ibatis.io.JBoss6VFS.VirtualFile getChild(URL url) throws IOException {
+        static JBoss6VFS.VirtualFile getChild(URL url) throws IOException {
             Object o = invoke(getChild, VFS, url);
-            return o == null ? null : new cn.lnd.ibatis.io.JBoss6VFS.VirtualFile(o);
+            return o == null ? null : new JBoss6VFS.VirtualFile(o);
         }
     }
 
@@ -82,20 +90,20 @@ public class JBoss6VFS extends VFS {
             valid = Boolean.TRUE;
 
             // Look up and verify required classes
-            cn.lnd.ibatis.io.JBoss6VFS.VFS.VFS = checkNotNull(getClass("org.jboss.vfs.VFS"));
-            cn.lnd.ibatis.io.JBoss6VFS.VirtualFile.VirtualFile = checkNotNull(getClass("org.jboss.vfs.VirtualFile"));
+            JBoss6VFS.VFS.VFS = checkNotNull(getClass("org.jboss.vfs.VFS"));
+            JBoss6VFS.VirtualFile.VirtualFile = checkNotNull(getClass("org.jboss.vfs.VirtualFile"));
 
             // Look up and verify required methods
-            cn.lnd.ibatis.io.JBoss6VFS.VFS.getChild = checkNotNull(getMethod(cn.lnd.ibatis.io.JBoss6VFS.VFS.VFS, "getChild", URL.class));
-            cn.lnd.ibatis.io.JBoss6VFS.VirtualFile.getChildrenRecursively = checkNotNull(getMethod(cn.lnd.ibatis.io.JBoss6VFS.VirtualFile.VirtualFile,
+            JBoss6VFS.VFS.getChild = checkNotNull(getMethod(JBoss6VFS.VFS.VFS, "getChild", URL.class));
+            JBoss6VFS.VirtualFile.getChildrenRecursively = checkNotNull(getMethod(JBoss6VFS.VirtualFile.VirtualFile,
                     "getChildrenRecursively"));
-            cn.lnd.ibatis.io.JBoss6VFS.VirtualFile.getPathNameRelativeTo = checkNotNull(getMethod(cn.lnd.ibatis.io.JBoss6VFS.VirtualFile.VirtualFile,
-                    "getPathNameRelativeTo", cn.lnd.ibatis.io.JBoss6VFS.VirtualFile.VirtualFile));
+            JBoss6VFS.VirtualFile.getPathNameRelativeTo = checkNotNull(getMethod(JBoss6VFS.VirtualFile.VirtualFile,
+                    "getPathNameRelativeTo", JBoss6VFS.VirtualFile.VirtualFile));
 
             // Verify that the API has not changed
-            checkReturnType(cn.lnd.ibatis.io.JBoss6VFS.VFS.getChild, cn.lnd.ibatis.io.JBoss6VFS.VirtualFile.VirtualFile);
-            checkReturnType(cn.lnd.ibatis.io.JBoss6VFS.VirtualFile.getChildrenRecursively, List.class);
-            checkReturnType(cn.lnd.ibatis.io.JBoss6VFS.VirtualFile.getPathNameRelativeTo, String.class);
+            checkReturnType(JBoss6VFS.VFS.getChild, JBoss6VFS.VirtualFile.VirtualFile);
+            checkReturnType(JBoss6VFS.VirtualFile.getChildrenRecursively, List.class);
+            checkReturnType(JBoss6VFS.VirtualFile.getPathNameRelativeTo, String.class);
         }
     }
 
@@ -130,12 +138,12 @@ public class JBoss6VFS extends VFS {
     }
 
     /**
-     * Mark this {@link cn.lnd.ibatis.io.JBoss6VFS.VFS} as invalid for the current environment.
+     * Mark this {@link JBoss6VFS.VFS} as invalid for the current environment.
      */
     protected static void setInvalid() {
-        if (cn.lnd.ibatis.io.JBoss6VFS.valid == Boolean.TRUE) {
+        if (JBoss6VFS.valid == Boolean.TRUE) {
             log.debug("JBoss 6 VFS API is not available in this environment.");
-            cn.lnd.ibatis.io.JBoss6VFS.valid = Boolean.FALSE;
+            JBoss6VFS.valid = Boolean.FALSE;
         }
     }
 
@@ -150,8 +158,8 @@ public class JBoss6VFS extends VFS {
 
     @Override
     public List<String> list(URL url, String path) throws IOException {
-        cn.lnd.ibatis.io.JBoss6VFS.VirtualFile directory;
-        directory = cn.lnd.ibatis.io.JBoss6VFS.VFS.getChild(url);
+        JBoss6VFS.VirtualFile directory;
+        directory = JBoss6VFS.VFS.getChild(url);
         if (directory == null) {
             return Collections.emptyList();
         }
@@ -160,9 +168,9 @@ public class JBoss6VFS extends VFS {
             path += "/";
         }
 
-        List<cn.lnd.ibatis.io.JBoss6VFS.VirtualFile> children = directory.getChildren();
+        List<JBoss6VFS.VirtualFile> children = directory.getChildren();
         List<String> names = new ArrayList<String>(children.size());
-        for (cn.lnd.ibatis.io.JBoss6VFS.VirtualFile vf : children) {
+        for (JBoss6VFS.VirtualFile vf : children) {
             names.add(path + vf.getPathNameRelativeTo(directory));
         }
 

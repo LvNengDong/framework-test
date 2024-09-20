@@ -14,40 +14,43 @@ import java.util.List;
 
 /**
  * @Author lnd
- * @Description
+ * @Description 虚拟文件系统( Virtual File System )抽象类，用来查找指定路径下的的文件们
  * @Date 2024/9/19 00:12
  */
 public abstract class VFS {
-    private static final Log log = LogFactory.getLog(cn.lnd.ibatis.io.VFS.class);
+    private static final Log log = LogFactory.getLog(VFS.class);
 
-    /** The built-in implementations. */
+    // 内置的 VFS 实现类的数组
     public static final Class<?>[] IMPLEMENTATIONS = { JBoss6VFS.class, DefaultVFS.class };
 
-    /** The list to which implementations are added by {@link #addImplClass(Class)}. */
-    public static final List<Class<? extends cn.lnd.ibatis.io.VFS>> USER_IMPLEMENTATIONS = new ArrayList<Class<? extends cn.lnd.ibatis.io.VFS>>();
+    // 自定义的 VFS 实现类的数组
+    // 可通过 #addImplClass(Class<? extends VFS> clazz) 方法，进行添加。
+    public static final List<Class<? extends VFS>> USER_IMPLEMENTATIONS = new ArrayList<>();
 
     /** Singleton instance. */
-    private static cn.lnd.ibatis.io.VFS instance;
+    private static VFS instance;
 
     /**
-     * Get the singleton {@link cn.lnd.ibatis.io.VFS} instance. If no {@link cn.lnd.ibatis.io.VFS} implementation can be found for the
+     * Get the singleton {@link VFS} instance. If no {@link VFS} implementation can be found for the
      * current environment, then this method returns null.
+     *
+     * 获得 VFS 单例
      */
     @SuppressWarnings("unchecked")
-    public static cn.lnd.ibatis.io.VFS getInstance() {
+    public static VFS getInstance() {
         if (instance != null) {
             return instance;
         }
 
         // Try the user implementations first, then the built-ins
-        List<Class<? extends cn.lnd.ibatis.io.VFS>> impls = new ArrayList<Class<? extends cn.lnd.ibatis.io.VFS>>();
+        List<Class<? extends VFS>> impls = new ArrayList<Class<? extends VFS>>();
         impls.addAll(USER_IMPLEMENTATIONS);
-        impls.addAll(Arrays.asList((Class<? extends cn.lnd.ibatis.io.VFS>[]) IMPLEMENTATIONS));
+        impls.addAll(Arrays.asList((Class<? extends VFS>[]) IMPLEMENTATIONS));
 
         // Try each implementation class until a valid one is found
-        cn.lnd.ibatis.io.VFS vfs = null;
+        VFS vfs = null;
         for (int i = 0; vfs == null || !vfs.isValid(); i++) {
-            Class<? extends cn.lnd.ibatis.io.VFS> impl = impls.get(i);
+            Class<? extends VFS> impl = impls.get(i);
             try {
                 vfs = impl.newInstance();
                 if (vfs == null || !vfs.isValid()) {
@@ -68,23 +71,24 @@ public abstract class VFS {
         if (log.isDebugEnabled()) {
             log.debug("Using VFS adapter " + vfs.getClass().getName());
         }
-        cn.lnd.ibatis.io.VFS.instance = vfs;
-        return cn.lnd.ibatis.io.VFS.instance;
+        VFS.instance = vfs;
+        return VFS.instance;
     }
 
     /**
-     * Adds the specified class to the list of {@link cn.lnd.ibatis.io.VFS} implementations. Classes added in this
+     * Adds the specified class to the list of {@link VFS} implementations. Classes added in this
      * manner are tried in the order they are added and before any of the built-in implementations.
      *
-     * @param clazz The {@link cn.lnd.ibatis.io.VFS} implementation class to add.
+     * @param clazz The {@link VFS} implementation class to add.
      */
-    public static void addImplClass(Class<? extends cn.lnd.ibatis.io.VFS> clazz) {
+    public static void addImplClass(Class<? extends VFS> clazz) {
         if (clazz != null) {
             USER_IMPLEMENTATIONS.add(clazz);
         }
     }
 
     /** Get a class by name. If the class is not found then return null. */
+
     protected static Class<?> getClass(String className) {
         try {
             return Thread.currentThread().getContextClassLoader().loadClass(className);
@@ -159,7 +163,11 @@ public abstract class VFS {
         return Collections.list(Thread.currentThread().getContextClassLoader().getResources(path));
     }
 
-    /** Return true if the {@link cn.lnd.ibatis.io.VFS} implementation is valid for the current environment. */
+    /**
+     * Return true if the {@link VFS} implementation is valid for the current environment.
+     *
+     * 抽象方法，判断是否为合法的 VFS
+     * */
     public abstract boolean isValid();
 
     /**
@@ -175,8 +183,7 @@ public abstract class VFS {
     protected abstract List<String> list(URL url, String forPath) throws IOException;
 
     /**
-     * Recursively list the full resource path of all the resources that are children of all the
-     * resources found at the specified path.
+     * 获得指定路径下的所有资源
      *
      * @param path The path of the resource(s) to list.
      * @return A list containing the names of the child resources.
@@ -184,6 +191,8 @@ public abstract class VFS {
      */
     public List<String> list(String path) throws IOException {
         List<String> names = new ArrayList<String>();
+        // 1、先调用 #getResources(String path) 静态方法，获得指定路径下的 URL 数组
+        // 2、后遍历 URL 数组，调用 #list(URL url, String forPath) 方法，递归的列出所有的资源们
         for (URL url : getResources(path)) {
             names.addAll(list(url, path));
         }
