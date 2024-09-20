@@ -4,12 +4,12 @@ import java.util.Properties;
 
 /**
  * @Author lnd
- * @Description
+ * @Description 动态属性解析器
  * @Date 2024/9/19 17:27
  */
 public class PropertyParser {
 
-    private static final String KEY_PREFIX = "cn.lnd.ibatis.parsing.PropertyParser.";
+    private static final String KEY_PREFIX = "PropertyParser.";
     /**
      * The special property key that indicate whether enable a default value on placeholder.
      * <p>
@@ -32,13 +32,28 @@ public class PropertyParser {
     private static final String ENABLE_DEFAULT_VALUE = "false";
     private static final String DEFAULT_VALUE_SEPARATOR = ":";
 
+    /**
+     * 构造方法，修饰符为 private ，禁止构造 PropertyParser 对象，因为它是一个静态方法的工具类。
+     */
     private PropertyParser() {
         // Prevent Instantiation
     }
 
+    /**
+     * 基于 variables 变量，替换 string 字符串中的动态属性，并返回结果
+     *
+     * @param string
+     * @param variables
+     * @return
+     */
     public static String parse(String string, Properties variables) {
-        cn.lnd.ibatis.parsing.PropertyParser.VariableTokenHandler handler = new cn.lnd.ibatis.parsing.PropertyParser.VariableTokenHandler(variables);
-        cn.lnd.ibatis.parsing.GenericTokenParser parser = new GenericTokenParser("${", "}", handler);
+        // <2.1> 创建 VariableTokenHandler 对象
+        VariableTokenHandler handler = new VariableTokenHandler(variables);
+        // <2.2> 创建 GenericTokenParser 对象
+        // 我们可以看到，openToken = { ，closeToken = } ，这不就是上面看到的 ${username} 和 ${password} 么
+        // 同时，我们也可以看到，handler 类型为 VariableTokenHandler ，也就是说，通过它实现自定义的处理逻辑。
+        GenericTokenParser parser = new GenericTokenParser("${", "}", handler);
+        // <2.3> 执行解析
         return parser.parse(string);
     }
 

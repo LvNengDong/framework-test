@@ -21,6 +21,7 @@
         <module>es-test</module>
         <module>netty-test</module>
         <module>tomcat-test</module>
+        <module>XPath-test</module>
     </modules>
 
     <properties>

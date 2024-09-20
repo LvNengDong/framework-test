@@ -7,6 +7,7 @@ import cn.lnd.ibatis.type.JdbcType;
 import cn.lnd.ibatis.type.TypeAliasRegistry;
 import cn.lnd.ibatis.type.TypeHandler;
 import cn.lnd.ibatis.type.TypeHandlerRegistry;
+import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -19,7 +20,11 @@ import java.util.regex.Pattern;
  * @Date 2024/9/18 23:38
  */
 public abstract class BaseBuilder {
+    // MyBatis Configuration 对象
+    // XML 和注解中解析到的配置，最终都会设置到 org.apache.ibatis.session.Configuration 中
+    @Getter
     protected final Configuration configuration;
+    //
     protected final TypeAliasRegistry typeAliasRegistry;
     protected final TypeHandlerRegistry typeHandlerRegistry;
 
@@ -29,14 +34,18 @@ public abstract class BaseBuilder {
         this.typeHandlerRegistry = this.configuration.getTypeHandlerRegistry();
     }
 
-    public Configuration getConfiguration() {
-        return configuration;
-    }
-
+    /**
+     * 创建正则表达式
+     *
+     * @param regex 指定表达式
+     * @param defaultValue 默认表达式
+     * @return 正则表达式
+     */
     protected Pattern parseExpression(String regex, String defaultValue) {
         return Pattern.compile(regex == null ? defaultValue : regex);
     }
 
+    // #xxxValueOf(...) 方法，将字符串转换成对应的数据类型的值
     protected Boolean booleanValueOf(String value, Boolean defaultValue) {
         return value == null ? defaultValue : Boolean.valueOf(value);
     }
@@ -50,6 +59,7 @@ public abstract class BaseBuilder {
         return new HashSet<String>(Arrays.asList(value.split(",")));
     }
 
+    // 解析对应的 JdbcType 类型
     protected JdbcType resolveJdbcType(String alias) {
         if (alias == null) {
             return null;
