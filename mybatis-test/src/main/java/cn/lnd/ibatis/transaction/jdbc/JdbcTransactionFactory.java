@@ -2,7 +2,7 @@ package cn.lnd.ibatis.transaction.jdbc;
 
 import cn.lnd.ibatis.transaction.Transaction;
 import cn.lnd.ibatis.transaction.TransactionFactory;
-import org.apache.ibatis.session.TransactionIsolationLevel;
+import cn.lnd.ibatis.session.TransactionIsolationLevel;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

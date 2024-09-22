@@ -14,7 +14,7 @@ import cn.lnd.ibatis.cache.impl.PerpetualCache;
 import cn.lnd.ibatis.datasource.jndi.JndiDataSourceFactory;
 import cn.lnd.ibatis.datasource.pooled.PooledDataSourceFactory;
 import cn.lnd.ibatis.datasource.unpooled.UnpooledDataSourceFactory;
-import cn.lnd.ibatis.executor.Executor;
+import cn.lnd.ibatis.executor.*;
 import cn.lnd.ibatis.executor.keygen.KeyGenerator;
 import cn.lnd.ibatis.executor.loader.ProxyFactory;
 import cn.lnd.ibatis.executor.loader.cglib.CglibProxyFactory;
@@ -55,6 +55,7 @@ import cn.lnd.ibatis.transaction.managed.ManagedTransactionFactory;
 import cn.lnd.ibatis.type.JdbcType;
 import cn.lnd.ibatis.type.TypeAliasRegistry;
 import cn.lnd.ibatis.type.TypeHandlerRegistry;
+import lombok.Getter;
 
 import java.util.*;
 
@@ -67,26 +68,47 @@ public class Configuration {
 
     protected Environment environment;
 
+    @Getter
     protected boolean safeRowBoundsEnabled;
+    @Getter
     protected boolean safeResultHandlerEnabled = true;
+    @Getter
     protected boolean mapUnderscoreToCamelCase;
+    @Getter
     protected boolean aggressiveLazyLoading;
     protected boolean multipleResultSetsEnabled = true;
+    @Getter
     protected boolean useGeneratedKeys;
+    @Getter
     protected boolean useColumnLabel = true;
     protected boolean cacheEnabled = true;
+    @Getter
     protected boolean callSettersOnNulls;
+    @Getter
     protected boolean useActualParamName = true;
+    @Getter
     protected boolean returnInstanceForEmptyRow;
 
+    @Getter
     protected String logPrefix;
+    @Getter
     protected Class <? extends Log> logImpl;
+    @Getter
     protected Class <? extends VFS> vfsImpl;
+    @Getter
     protected LocalCacheScope localCacheScope = LocalCacheScope.SESSION;
+    @Getter
     protected JdbcType jdbcTypeForNull = JdbcType.OTHER;
-    protected Set<String> lazyLoadTriggerMethods = new HashSet<String>(Arrays.asList(new String[] { "equals", "clone", "hashCode", "toString" }));
+    @Getter
+    protected Set<String> lazyLoadTriggerMethods = new HashSet<>(Arrays.asList("equals", "clone", "hashCode", "toString"));
     protected Integer defaultStatementTimeout;
+    /**
+     * -- GETTER --
+     *
+     */
+    @Getter
     protected Integer defaultFetchSize;
+    @Getter
     protected cn.lnd.ibatis.session.ExecutorType defaultExecutorType = cn.lnd.ibatis.session.ExecutorType.SIMPLE;
     protected AutoMappingBehavior autoMappingBehavior = AutoMappingBehavior.PARTIAL;
     protected AutoMappingUnknownColumnBehavior autoMappingUnknownColumnBehavior = AutoMappingUnknownColumnBehavior.NONE;
@@ -99,6 +121,7 @@ public class Configuration {
     protected boolean lazyLoadingEnabled = false;
     protected ProxyFactory proxyFactory = new JavassistProxyFactory(); // #224 Using internal Javassist instead of OGNL
 
+    @Getter
     protected String databaseId;
     /**
      * Configuration factory class.
@@ -106,6 +129,7 @@ public class Configuration {
      *
      * @see <a href='https://code.google.com/p/mybatis/issues/detail?id=300'>Issue 300 (google code)</a>
      */
+    @Getter
     protected Class<?> configurationFactory;
 
     protected final MapperRegistry mapperRegistry = new MapperRegistry(this);
@@ -174,16 +198,8 @@ public class Configuration {
         languageRegistry.register(RawLanguageDriver.class);
     }
 
-    public String getLogPrefix() {
-        return logPrefix;
-    }
-
     public void setLogPrefix(String logPrefix) {
         this.logPrefix = logPrefix;
-    }
-
-    public Class<? extends Log> getLogImpl() {
-        return logImpl;
     }
 
     public void setLogImpl(Class<? extends Log> logImpl) {
@@ -193,10 +209,6 @@ public class Configuration {
         }
     }
 
-    public Class<? extends VFS> getVfsImpl() {
-        return this.vfsImpl;
-    }
-
     public void setVfsImpl(Class<? extends VFS> vfsImpl) {
         if (vfsImpl != null) {
             this.vfsImpl = vfsImpl;
@@ -204,64 +216,32 @@ public class Configuration {
         }
     }
 
-    public boolean isCallSettersOnNulls() {
-        return callSettersOnNulls;
-    }
-
     public void setCallSettersOnNulls(boolean callSettersOnNulls) {
         this.callSettersOnNulls = callSettersOnNulls;
-    }
-
-    public boolean isUseActualParamName() {
-        return useActualParamName;
     }
 
     public void setUseActualParamName(boolean useActualParamName) {
         this.useActualParamName = useActualParamName;
     }
 
-    public boolean isReturnInstanceForEmptyRow() {
-        return returnInstanceForEmptyRow;
-    }
-
     public void setReturnInstanceForEmptyRow(boolean returnEmptyInstance) {
         this.returnInstanceForEmptyRow = returnEmptyInstance;
-    }
-
-    public String getDatabaseId() {
-        return databaseId;
     }
 
     public void setDatabaseId(String databaseId) {
         this.databaseId = databaseId;
     }
 
-    public Class<?> getConfigurationFactory() {
-        return configurationFactory;
-    }
-
     public void setConfigurationFactory(Class<?> configurationFactory) {
         this.configurationFactory = configurationFactory;
-    }
-
-    public boolean isSafeResultHandlerEnabled() {
-        return safeResultHandlerEnabled;
     }
 
     public void setSafeResultHandlerEnabled(boolean safeResultHandlerEnabled) {
         this.safeResultHandlerEnabled = safeResultHandlerEnabled;
     }
 
-    public boolean isSafeRowBoundsEnabled() {
-        return safeRowBoundsEnabled;
-    }
-
     public void setSafeRowBoundsEnabled(boolean safeRowBoundsEnabled) {
         this.safeRowBoundsEnabled = safeRowBoundsEnabled;
-    }
-
-    public boolean isMapUnderscoreToCamelCase() {
-        return mapUnderscoreToCamelCase;
     }
 
     public void setMapUnderscoreToCamelCase(boolean mapUnderscoreToCamelCase) {
@@ -325,10 +305,6 @@ public class Configuration {
         this.proxyFactory = proxyFactory;
     }
 
-    public boolean isAggressiveLazyLoading() {
-        return aggressiveLazyLoading;
-    }
-
     public void setAggressiveLazyLoading(boolean aggressiveLazyLoading) {
         this.aggressiveLazyLoading = aggressiveLazyLoading;
     }
@@ -341,24 +317,12 @@ public class Configuration {
         this.multipleResultSetsEnabled = multipleResultSetsEnabled;
     }
 
-    public Set<String> getLazyLoadTriggerMethods() {
-        return lazyLoadTriggerMethods;
-    }
-
     public void setLazyLoadTriggerMethods(Set<String> lazyLoadTriggerMethods) {
         this.lazyLoadTriggerMethods = lazyLoadTriggerMethods;
     }
 
-    public boolean isUseGeneratedKeys() {
-        return useGeneratedKeys;
-    }
-
     public void setUseGeneratedKeys(boolean useGeneratedKeys) {
         this.useGeneratedKeys = useGeneratedKeys;
-    }
-
-    public cn.lnd.ibatis.session.ExecutorType getDefaultExecutorType() {
-        return defaultExecutorType;
     }
 
     public void setDefaultExecutorType(cn.lnd.ibatis.session.ExecutorType defaultExecutorType) {
@@ -384,35 +348,16 @@ public class Configuration {
     /**
      * @since 3.3.0
      */
-    public Integer getDefaultFetchSize() {
-        return defaultFetchSize;
-    }
-
-    /**
-     * @since 3.3.0
-     */
     public void setDefaultFetchSize(Integer defaultFetchSize) {
         this.defaultFetchSize = defaultFetchSize;
-    }
-
-    public boolean isUseColumnLabel() {
-        return useColumnLabel;
     }
 
     public void setUseColumnLabel(boolean useColumnLabel) {
         this.useColumnLabel = useColumnLabel;
     }
 
-    public LocalCacheScope getLocalCacheScope() {
-        return localCacheScope;
-    }
-
     public void setLocalCacheScope(LocalCacheScope localCacheScope) {
         this.localCacheScope = localCacheScope;
-    }
-
-    public JdbcType getJdbcTypeForNull() {
-        return jdbcTypeForNull;
     }
 
     public void setJdbcTypeForNull(JdbcType jdbcTypeForNull) {

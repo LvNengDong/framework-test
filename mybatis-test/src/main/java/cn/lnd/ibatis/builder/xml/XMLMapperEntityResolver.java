@@ -12,7 +12,8 @@ import java.util.Locale;
 /**
  * @Author lnd
  * @Description
- *      实现 org.xml.sax.EntityResolver 接口，MyBatis 自定义 EntityResolver 实现类，用于加载本地的 mybatis-3-config.dtd 和 mybatis-3-mapper.dtd 这两个 DTD 文件。
+ *      实现 org.xml.sax.EntityResolver 接口，MyBatis 自定义 EntityResolver 实现类，
+ *      用于加载本地的 mybatis-3-config.dtd 和 mybatis-3-mapper.dtd 这两个 DTD 文件。
  * @Date 2024/9/18 23:54
  */
 public class XMLMapperEntityResolver implements EntityResolver {

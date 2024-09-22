@@ -1,6 +1,7 @@
 package cn.lnd.ibatis.builder.annotation;
 
-import cn.lnd.ibatis.annotations.MapKey;
+import cn.lnd.ibatis.annotations.*;
+import cn.lnd.ibatis.annotations.ResultMap;
 import cn.lnd.ibatis.binding.BindingException;
 import cn.lnd.ibatis.binding.MapperMethod;
 import cn.lnd.ibatis.builder.BuilderException;
@@ -508,9 +509,9 @@ public class MapperAnnotationBuilder {
 
     private boolean isLazy(Result result) {
         boolean isLazy = configuration.isLazyLoadingEnabled();
-        if (result.one().select().length() > 0 && FetchType.DEFAULT != result.one().fetchType()) {
+        if (!result.one().select().isEmpty() && FetchType.DEFAULT != result.one().fetchType()) {
             isLazy = (result.one().fetchType() == FetchType.LAZY);
-        } else if (result.many().select().length() > 0 && FetchType.DEFAULT != result.many().fetchType()) {
+        } else if (!result.many().select().isEmpty() && FetchType.DEFAULT != result.many().fetchType()) {
             isLazy = (result.many().fetchType() == FetchType.LAZY);
         }
         return isLazy;

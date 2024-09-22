@@ -30,14 +30,22 @@ import java.util.Properties;
 /**
  * @Author lnd
  * @Description
+ *      XML 配置构建器
+ *      主要功能：
+ *          1、构造函数：在构造函数中，调用 XPath 解析器加载 mybatis-config.xml 配置文件到内存中
+ *          2、parse() 方法：负责解析 mybatis-config.xml 配置文件，得到对应的 Configuration 全局配置对象。
  * @Date 2024/9/18 23:38
  */
 public class XMLConfigBuilder extends BaseBuilder {
 
+    /* 是否已解析 */
     private boolean parsed;
-    private XPathParser parser;
+    /* Java XPath 解析器 */
+    private final XPathParser parser;
+    /* 环境 */
     private String environment;
-    private ReflectorFactory localReflectorFactory = new DefaultReflectorFactory();
+    /* ReflectorFactory 对象 (主要用于实现对 Reflector 对象的创建和缓存）*/
+    private final ReflectorFactory localReflectorFactory = new DefaultReflectorFactory();
 
     public XMLConfigBuilder(Reader reader) {
         this(reader, null, null);
@@ -48,7 +56,11 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
 
     public XMLConfigBuilder(Reader reader, String environment, Properties props) {
-        this(new XPathParser(reader, true, props, new XMLMapperEntityResolver()), environment, props);
+        this(
+                new XPathParser(reader, true, props, new XMLMapperEntityResolver()),
+                environment,
+                props
+        );
     }
 
     public XMLConfigBuilder(InputStream inputStream) {
@@ -64,19 +76,28 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
 
     private XMLConfigBuilder(XPathParser parser, String environment, Properties props) {
+        // <1> 创建 Configuration 对象
         super(new Configuration());
         ErrorContext.instance().resource("SQL Mapper Configuration");
+        // <2> 设置 Configuration 的 variables 属性
         this.configuration.setVariables(props);
         this.parsed = false;
         this.environment = environment;
         this.parser = parser;
     }
 
+    /**
+     * 解析 XML 成 Configuration 对象
+     * @return
+     */
     public Configuration parse() {
+        // <1.1> 若已解析，抛出 BuilderException 异常
         if (parsed) {
             throw new BuilderException("Each XMLConfigBuilder can only be used once.");
         }
+        // <1.2> 标记已解析
         parsed = true;
+        // <2> 解析 XML configuration 节点
         parseConfiguration(parser.evalNode("/configuration"));
         return configuration;
     }
@@ -84,19 +105,31 @@ public class XMLConfigBuilder extends BaseBuilder {
     private void parseConfiguration(XNode root) {
         try {
             //issue #117 read properties first
+            // 解析 <properties> 标签
             propertiesElement(root.evalNode("properties"));
+            // 解析 <settings> 标签
             Properties settings = settingsAsProperties(root.evalNode("settings"));
+            // 处理日志相关组件；
             loadCustomVfs(settings);
+            // 解析 `<typeAliases>` 标签；
             typeAliasesElement(root.evalNode("typeAliases"));
+            // 解析 `<plugins>` 标签；
             pluginElement(root.evalNode("plugins"));
+            // 解析 `<objectFactory>` 标签；
             objectFactoryElement(root.evalNode("objectFactory"));
+            // 解析 `<objectWrapperFactory>` 标签；
             objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
+            // 解析 `<reflectorFactory>` 标签；
             reflectorFactoryElement(root.evalNode("reflectorFactory"));
             settingsElement(settings);
-            // read it after objectFactory and objectWrapperFactory issue #631
+            // 解析 `<environments>` 标签；
             environmentsElement(root.evalNode("environments"));
+            // 解析 `<databaseIdProvider>` 标签；
             databaseIdProviderElement(root.evalNode("databaseIdProvider"));
+            // 解析 `<typeHandlers>` 标签；
             typeHandlerElement(root.evalNode("typeHandlers"));
+            //10. 解析 `<mappers>` 标签。
+            // read it after objectFactory and objectWrapperFactory issue #631
             mapperElement(root.evalNode("mappers"));
         } catch (Exception e) {
             throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);

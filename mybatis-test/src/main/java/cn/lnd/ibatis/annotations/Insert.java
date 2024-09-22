@@ -11,5 +11,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Insert {
+    /**
+     * @return 插入语句
+     */
     String[] value();
 }

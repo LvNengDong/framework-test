@@ -1,8 +1,8 @@
 package cn.lnd.ibatis.session;
 
-import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.ExecutorType;
-import org.apache.ibatis.session.SqlSession;
+import cn.lnd.ibatis.session.Configuration;
+import cn.lnd.ibatis.session.ExecutorType;
+import cn.lnd.ibatis.session.SqlSession;
 
 import java.sql.Connection;
 

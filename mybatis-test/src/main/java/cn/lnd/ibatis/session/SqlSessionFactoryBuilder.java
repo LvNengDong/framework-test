@@ -30,6 +30,8 @@ public class SqlSessionFactoryBuilder {
     }
 
     /**
+     * >>> MyBatis 初始化流程入口 <<<
+     *
      * 构造 SqlSessionFactory 对象
      *
      * @param reader Reader 对象
@@ -39,9 +41,9 @@ public class SqlSessionFactoryBuilder {
      */
     public SqlSessionFactory build(Reader reader, String environment, Properties properties) {
         try {
-            // <1> 创建 XMLConfigBuilder 对象
+            // <1> 创建 XMLConfigBuilder 对象 【加载配置文件】
             XMLConfigBuilder parser = new XMLConfigBuilder(reader, environment, properties);
-            // <2> 执行 XML 解析 [ 调用 XMLConfigBuilder#parse() 方法，执行 XML 解析，返回 Configuration 对象。]
+            // <2> 执行 XML 解析 [ 调用 XMLConfigBuilder#parse() 方法，执行 XML 解析，返回 Configuration 对象。] 【解析配置文件】
             // <3> 创建 DefaultSqlSessionFactory 对象
             return build(parser.parse());
         } catch (Exception e) {
@@ -84,6 +86,11 @@ public class SqlSessionFactoryBuilder {
         }
     }
 
+    /**
+     * 构造者模式：将复杂的参数包装成一个 Configuration 对象，在创建 DefaultSqlSessionFactory 只需要传入一个 Configuration 对象即可
+     * @param config
+     * @return
+     */
     public SqlSessionFactory build(Configuration config) {
         return new DefaultSqlSessionFactory(config);
     }

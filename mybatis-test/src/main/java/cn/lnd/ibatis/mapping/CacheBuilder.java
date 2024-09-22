@@ -3,10 +3,7 @@ package cn.lnd.ibatis.mapping;
 import cn.lnd.ibatis.builder.InitializingObject;
 import cn.lnd.ibatis.cache.Cache;
 import cn.lnd.ibatis.cache.CacheException;
-import cn.lnd.ibatis.cache.decorators.BlockingCache;
-import cn.lnd.ibatis.cache.decorators.LoggingCache;
-import cn.lnd.ibatis.cache.decorators.LruCache;
-import cn.lnd.ibatis.cache.decorators.SynchronizedCache;
+import cn.lnd.ibatis.cache.decorators.*;
 import cn.lnd.ibatis.cache.impl.PerpetualCache;
 import cn.lnd.ibatis.reflection.MetaObject;
 import cn.lnd.ibatis.reflection.SystemMetaObject;
@@ -34,7 +31,7 @@ public class CacheBuilder {
 
     public CacheBuilder(String id) {
         this.id = id;
-        this.decorators = new ArrayList<Class<? extends Cache>>();
+        this.decorators = new ArrayList<>();
     }
 
     public CacheBuilder implementation(Class<? extends Cache> implementation) {

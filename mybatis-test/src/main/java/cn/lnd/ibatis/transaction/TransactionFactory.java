@@ -1,6 +1,6 @@
 package cn.lnd.ibatis.transaction;
 
-import org.apache.ibatis.session.TransactionIsolationLevel;
+import cn.lnd.ibatis.session.TransactionIsolationLevel;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

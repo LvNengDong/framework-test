@@ -3,7 +3,7 @@ package cn.lnd.ibatis.transaction.managed;
 import cn.lnd.ibatis.logging.Log;
 import cn.lnd.ibatis.logging.LogFactory;
 import cn.lnd.ibatis.transaction.Transaction;
-import org.apache.ibatis.session.TransactionIsolationLevel;
+import cn.lnd.ibatis.session.TransactionIsolationLevel;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

@@ -1,10 +1,10 @@
 package cn.lnd.ibatis.annotations;
 
-import org.apache.ibatis.annotations.Many;
-import org.apache.ibatis.annotations.One;
-import org.apache.ibatis.type.JdbcType;
-import org.apache.ibatis.type.TypeHandler;
-import org.apache.ibatis.type.UnknownTypeHandler;
+import cn.lnd.ibatis.annotations.Many;
+import cn.lnd.ibatis.annotations.One;
+import cn.lnd.ibatis.type.JdbcType;
+import cn.lnd.ibatis.type.TypeHandler;
+import cn.lnd.ibatis.type.UnknownTypeHandler;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -32,7 +32,7 @@ public @interface Result {
 
     Class<? extends TypeHandler> typeHandler() default UnknownTypeHandler.class;
 
-    org.apache.ibatis.annotations.One one() default @One;
+    cn.lnd.ibatis.annotations.One one() default @One;
 
-    org.apache.ibatis.annotations.Many many() default @Many;
+    cn.lnd.ibatis.annotations.Many many() default @Many;
 }

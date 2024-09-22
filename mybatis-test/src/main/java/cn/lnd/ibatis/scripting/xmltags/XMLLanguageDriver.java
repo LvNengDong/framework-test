@@ -40,7 +40,7 @@ public class XMLLanguageDriver implements LanguageDriver {
         } else {
             // issue #127
             script = PropertyParser.parse(script, configuration.getVariables());
-            cn.lnd.ibatis.scripting.xmltags.TextSqlNode textSqlNode = new TextSqlNode(script);
+            TextSqlNode textSqlNode = new TextSqlNode(script);
             if (textSqlNode.isDynamic()) {
                 return new DynamicSqlSource(configuration, textSqlNode);
             } else {
