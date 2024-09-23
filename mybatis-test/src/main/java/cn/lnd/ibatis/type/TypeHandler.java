@@ -7,12 +7,16 @@ import java.sql.SQLException;
 
 /**
  * @Author lnd
- * @Description
+ * @Description 类型转换处理器
+ *      一共有两类方法，分别是：
+ *          #setParameter(...) 方法，是 Java Type => JDBC Type 的过程。
+ *          #getResult(...) 方法，是 JDBC Type => Java Type 的过程。
  * @Date 2024/9/14 22:33
  */
 public interface TypeHandler<T> {
     /**
      *  在通过PreparedStatement为SQL语句绑定参数时，会将传入的实参数据由Java类型转换成JdbcType类型
+     *
      *  Java Type => JDBC Type
      *
      * @param ps PreparedStatement 对象
@@ -25,6 +29,7 @@ public interface TypeHandler<T> {
 
     /**
      *  从ResultSet中获取数据时会使用getResult()方法，其中会将读取到的数据由JdbcType类型转换成Java类型
+     *
      *  JDBC Type => Java Type
      *
      * @param rs ResultSet 对象
@@ -36,6 +41,7 @@ public interface TypeHandler<T> {
 
     /**
      * 功能同上
+     *
      * JDBC Type => Java Type
      *
      * @param rs ResultSet 对象
@@ -47,6 +53,7 @@ public interface TypeHandler<T> {
 
     /**
      * 获得 CallableStatement 的指定字段的值
+     *
      * JDBC Type => Java Type
      *
      * @param cs CallableStatement 对象，支持调用存储过程

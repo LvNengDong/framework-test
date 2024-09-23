@@ -11,6 +11,7 @@ import java.sql.SQLException;
 /**
  * @Author lnd
  * @Description
+ *      实现 TypeHandler 接口，继承 TypeReference 抽象类，TypeHandler 基础抽象类。
  * @Date 2024/9/19 11:44
  */
 public abstract class BaseTypeHandler<T> extends TypeReference<T> implements TypeHandler<T> {
@@ -23,6 +24,7 @@ public abstract class BaseTypeHandler<T> extends TypeReference<T> implements Typ
 
     @Override
     public void setParameter(PreparedStatement ps, int i, T parameter, JdbcType jdbcType) throws SQLException {
+        // <1> 参数为空时，设置为 null 类型
         if (parameter == null) {
             if (jdbcType == null) {
                 throw new TypeException("JDBC requires that the JdbcType must be specified for all nullable parameters.");
@@ -34,7 +36,9 @@ public abstract class BaseTypeHandler<T> extends TypeReference<T> implements Typ
                         "Try setting a different JdbcType for this parameter or a different jdbcTypeForNull configuration property. " +
                         "Cause: " + e, e);
             }
-        } else {
+        }
+        // 参数非空时，设置对应的参数
+        else {
             try {
                 setNonNullParameter(ps, i, parameter, jdbcType);
             } catch (Exception e) {
