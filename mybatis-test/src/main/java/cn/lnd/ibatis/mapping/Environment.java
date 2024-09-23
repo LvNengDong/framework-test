@@ -10,8 +10,11 @@ import javax.sql.DataSource;
  * @Date 2024/9/19 00:12
  */
 public class Environment {
+    /* 环境编号 */
     private final String id;
+    /* TransactionFactory 对象 */
     private final TransactionFactory transactionFactory;
+    /* DataSource 对象 */
     private final DataSource dataSource;
 
     public Environment(String id, TransactionFactory transactionFactory, DataSource dataSource) {
@@ -30,20 +33,23 @@ public class Environment {
     }
 
     public static class Builder {
+        /* 环境编号 */
         private String id;
+        /* TransactionFactory 对象 */
         private TransactionFactory transactionFactory;
+        /* 环境编号 */
         private DataSource dataSource;
 
         public Builder(String id) {
             this.id = id;
         }
 
-        public cn.lnd.ibatis.mapping.Environment.Builder transactionFactory(TransactionFactory transactionFactory) {
+        public Environment.Builder transactionFactory(TransactionFactory transactionFactory) {
             this.transactionFactory = transactionFactory;
             return this;
         }
 
-        public cn.lnd.ibatis.mapping.Environment.Builder dataSource(DataSource dataSource) {
+        public Environment.Builder dataSource(DataSource dataSource) {
             this.dataSource = dataSource;
             return this;
         }
@@ -52,8 +58,8 @@ public class Environment {
             return this.id;
         }
 
-        public cn.lnd.ibatis.mapping.Environment build() {
-            return new cn.lnd.ibatis.mapping.Environment(this.id, this.transactionFactory, this.dataSource);
+        public Environment build() {
+            return new Environment(this.id, this.transactionFactory, this.dataSource);
         }
 
     }

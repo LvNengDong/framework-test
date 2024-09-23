@@ -20,7 +20,7 @@ public class XNode {
     private String body;
     private Properties attributes;
     private Properties variables;
-    private cn.lnd.ibatis.parsing.XPathParser xpathParser;
+    private XPathParser xpathParser;
 
     public XNode(XPathParser xpathParser, Node node, Properties variables) {
         this.xpathParser = xpathParser;
@@ -31,16 +31,16 @@ public class XNode {
         this.body = parseBody(node);
     }
 
-    public cn.lnd.ibatis.parsing.XNode newXNode(Node node) {
-        return new cn.lnd.ibatis.parsing.XNode(xpathParser, node, variables);
+    public XNode newXNode(Node node) {
+        return new XNode(xpathParser, node, variables);
     }
 
-    public cn.lnd.ibatis.parsing.XNode getParent() {
+    public XNode getParent() {
         Node parent = node.getParentNode();
         if (parent == null || !(parent instanceof Element)) {
             return null;
         } else {
-            return new cn.lnd.ibatis.parsing.XNode(xpathParser, parent, variables);
+            return new XNode(xpathParser, parent, variables);
         }
     }
 
@@ -59,7 +59,7 @@ public class XNode {
 
     public String getValueBasedIdentifier() {
         StringBuilder builder = new StringBuilder();
-        cn.lnd.ibatis.parsing.XNode current = this;
+        XNode current = this;
         while (current != null) {
             if (current != this) {
                 builder.insert(0, "_");
@@ -92,11 +92,11 @@ public class XNode {
         return xpathParser.evalDouble(node, expression);
     }
 
-    public List<cn.lnd.ibatis.parsing.XNode> evalNodes(String expression) {
+    public List<XNode> evalNodes(String expression) {
         return xpathParser.evalNodes(node, expression);
     }
 
-    public cn.lnd.ibatis.parsing.XNode evalNode(String expression) {
+    public XNode evalNode(String expression) {
         return xpathParser.evalNode(node, expression);
     }
 
@@ -271,15 +271,13 @@ public class XNode {
         }
     }
 
-    public List<cn.lnd.ibatis.parsing.XNode> getChildren() {
-        List<cn.lnd.ibatis.parsing.XNode> children = new ArrayList<cn.lnd.ibatis.parsing.XNode>();
+    public List<XNode> getChildren() {
+        List<XNode> children = new ArrayList<>();
         NodeList nodeList = node.getChildNodes();
-        if (nodeList != null) {
-            for (int i = 0, n = nodeList.getLength(); i < n; i++) {
-                Node node = nodeList.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    children.add(new cn.lnd.ibatis.parsing.XNode(xpathParser, node, variables));
-                }
+        for (int i = 0, n = nodeList.getLength(); i < n; i++) {
+            Node node = nodeList.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                children.add(new XNode(xpathParser, node, variables));
             }
         }
         return children;
@@ -287,7 +285,7 @@ public class XNode {
 
     public Properties getChildrenAsProperties() {
         Properties properties = new Properties();
-        for (cn.lnd.ibatis.parsing.XNode child : getChildren()) {
+        for (XNode child : getChildren()) {
             String name = child.getStringAttribute("name");
             String value = child.getStringAttribute("value");
             if (name != null && value != null) {
@@ -309,10 +307,10 @@ public class XNode {
             builder.append(entry.getValue());
             builder.append("\"");
         }
-        List<cn.lnd.ibatis.parsing.XNode> children = getChildren();
+        List<XNode> children = getChildren();
         if (!children.isEmpty()) {
             builder.append(">\n");
-            for (cn.lnd.ibatis.parsing.XNode node : children) {
+            for (XNode node : children) {
                 builder.append(node.toString());
             }
             builder.append("</");
@@ -337,7 +335,7 @@ public class XNode {
         if (attributeNodes != null) {
             for (int i = 0; i < attributeNodes.getLength(); i++) {
                 Node attribute = attributeNodes.item(i);
-                String value = cn.lnd.ibatis.parsing.PropertyParser.parse(attribute.getNodeValue(), variables);
+                String value = PropertyParser.parse(attribute.getNodeValue(), variables);
                 attributes.put(attribute.getNodeName(), value);
             }
         }

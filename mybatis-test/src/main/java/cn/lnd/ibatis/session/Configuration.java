@@ -56,6 +56,7 @@ import cn.lnd.ibatis.type.JdbcType;
 import cn.lnd.ibatis.type.TypeAliasRegistry;
 import cn.lnd.ibatis.type.TypeHandlerRegistry;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.*;
 
@@ -66,6 +67,7 @@ import java.util.*;
  */
 public class Configuration {
 
+    @Getter
     protected Environment environment;
 
     @Getter
@@ -101,6 +103,7 @@ public class Configuration {
     protected JdbcType jdbcTypeForNull = JdbcType.OTHER;
     @Getter
     protected Set<String> lazyLoadTriggerMethods = new HashSet<>(Arrays.asList("equals", "clone", "hashCode", "toString"));
+    @Getter
     protected Integer defaultStatementTimeout;
     /**
      * -- GETTER --
@@ -110,15 +113,27 @@ public class Configuration {
     protected Integer defaultFetchSize;
     @Getter
     protected cn.lnd.ibatis.session.ExecutorType defaultExecutorType = cn.lnd.ibatis.session.ExecutorType.SIMPLE;
+    @Getter
     protected AutoMappingBehavior autoMappingBehavior = AutoMappingBehavior.PARTIAL;
+    /**
+     * -- GETTER --
+     *
+     */
+    @Getter
     protected AutoMappingUnknownColumnBehavior autoMappingUnknownColumnBehavior = AutoMappingUnknownColumnBehavior.NONE;
 
+    @Getter
     protected Properties variables = new Properties();
+    @Getter
     protected ReflectorFactory reflectorFactory = new DefaultReflectorFactory();
+    @Getter
     protected ObjectFactory objectFactory = new DefaultObjectFactory();
+    @Getter
     protected ObjectWrapperFactory objectWrapperFactory = new DefaultObjectWrapperFactory();
 
+    @Getter
     protected boolean lazyLoadingEnabled = false;
+    @Getter
     protected ProxyFactory proxyFactory = new JavassistProxyFactory(); // #224 Using internal Javassist instead of OGNL
 
     @Getter
@@ -131,20 +146,25 @@ public class Configuration {
      */
     @Getter
     protected Class<?> configurationFactory;
-
+    @Getter
     protected final MapperRegistry mapperRegistry = new MapperRegistry(this);
+    /* 拦截器链 */
     protected final InterceptorChain interceptorChain = new InterceptorChain();
+    @Getter
     protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry();
+    @Getter
     protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
+    @Getter
     protected final LanguageDriverRegistry languageRegistry = new LanguageDriverRegistry();
 
-    protected final Map<String, MappedStatement> mappedStatements = new cn.lnd.ibatis.session.Configuration.StrictMap<MappedStatement>("Mapped Statements collection");
-    protected final Map<String, Cache> caches = new cn.lnd.ibatis.session.Configuration.StrictMap<Cache>("Caches collection");
-    protected final Map<String, ResultMap> resultMaps = new cn.lnd.ibatis.session.Configuration.StrictMap<ResultMap>("Result Maps collection");
-    protected final Map<String, ParameterMap> parameterMaps = new cn.lnd.ibatis.session.Configuration.StrictMap<ParameterMap>("Parameter Maps collection");
-    protected final Map<String, KeyGenerator> keyGenerators = new cn.lnd.ibatis.session.Configuration.StrictMap<KeyGenerator>("Key Generators collection");
+    protected final Map<String, MappedStatement> mappedStatements = new cn.lnd.ibatis.session.Configuration.StrictMap<>("Mapped Statements collection");
+    protected final Map<String, Cache> caches = new cn.lnd.ibatis.session.Configuration.StrictMap<>("Caches collection");
+    protected final Map<String, ResultMap> resultMaps = new cn.lnd.ibatis.session.Configuration.StrictMap<>("Result Maps collection");
+    protected final Map<String, ParameterMap> parameterMaps = new cn.lnd.ibatis.session.Configuration.StrictMap<>("Parameter Maps collection");
+    protected final Map<String, KeyGenerator> keyGenerators = new cn.lnd.ibatis.session.Configuration.StrictMap<>("Key Generators collection");
 
     protected final Set<String> loadedResources = new HashSet<String>();
+    @Getter
     protected final Map<String, XNode> sqlFragments = new cn.lnd.ibatis.session.Configuration.StrictMap<XNode>("XML fragments parsed from previous mappers");
 
     protected final Collection<XMLStatementBuilder> incompleteStatements = new LinkedList<XMLStatementBuilder>();
@@ -211,7 +231,9 @@ public class Configuration {
 
     public void setVfsImpl(Class<? extends VFS> vfsImpl) {
         if (vfsImpl != null) {
+            // 设置 vfsImpl 属性
             this.vfsImpl = vfsImpl;
+            // 添加到 VFS 中的自定义 VFS 类的集合
             VFS.addImplClass(this.vfsImpl);
         }
     }
@@ -256,16 +278,8 @@ public class Configuration {
         return loadedResources.contains(resource);
     }
 
-    public Environment getEnvironment() {
-        return environment;
-    }
-
     public void setEnvironment(Environment environment) {
         this.environment = environment;
-    }
-
-    public AutoMappingBehavior getAutoMappingBehavior() {
-        return autoMappingBehavior;
     }
 
     public void setAutoMappingBehavior(AutoMappingBehavior autoMappingBehavior) {
@@ -275,27 +289,12 @@ public class Configuration {
     /**
      * @since 3.4.0
      */
-    public AutoMappingUnknownColumnBehavior getAutoMappingUnknownColumnBehavior() {
-        return autoMappingUnknownColumnBehavior;
-    }
-
-    /**
-     * @since 3.4.0
-     */
     public void setAutoMappingUnknownColumnBehavior(AutoMappingUnknownColumnBehavior autoMappingUnknownColumnBehavior) {
         this.autoMappingUnknownColumnBehavior = autoMappingUnknownColumnBehavior;
     }
 
-    public boolean isLazyLoadingEnabled() {
-        return lazyLoadingEnabled;
-    }
-
     public void setLazyLoadingEnabled(boolean lazyLoadingEnabled) {
         this.lazyLoadingEnabled = lazyLoadingEnabled;
-    }
-
-    public ProxyFactory getProxyFactory() {
-        return proxyFactory;
     }
 
     public void setProxyFactory(ProxyFactory proxyFactory) {
@@ -337,10 +336,6 @@ public class Configuration {
         this.cacheEnabled = cacheEnabled;
     }
 
-    public Integer getDefaultStatementTimeout() {
-        return defaultStatementTimeout;
-    }
-
     public void setDefaultStatementTimeout(Integer defaultStatementTimeout) {
         this.defaultStatementTimeout = defaultStatementTimeout;
     }
@@ -364,47 +359,16 @@ public class Configuration {
         this.jdbcTypeForNull = jdbcTypeForNull;
     }
 
-    public Properties getVariables() {
-        return variables;
-    }
-
     public void setVariables(Properties variables) {
         this.variables = variables;
-    }
-
-    public TypeHandlerRegistry getTypeHandlerRegistry() {
-        return typeHandlerRegistry;
-    }
-
-    public TypeAliasRegistry getTypeAliasRegistry() {
-        return typeAliasRegistry;
-    }
-
-    /**
-     * @since 3.2.2
-     */
-    public MapperRegistry getMapperRegistry() {
-        return mapperRegistry;
-    }
-
-    public ReflectorFactory getReflectorFactory() {
-        return reflectorFactory;
     }
 
     public void setReflectorFactory(ReflectorFactory reflectorFactory) {
         this.reflectorFactory = reflectorFactory;
     }
 
-    public ObjectFactory getObjectFactory() {
-        return objectFactory;
-    }
-
     public void setObjectFactory(ObjectFactory objectFactory) {
         this.objectFactory = objectFactory;
-    }
-
-    public ObjectWrapperFactory getObjectWrapperFactory() {
-        return objectWrapperFactory;
     }
 
     public void setObjectWrapperFactory(ObjectWrapperFactory objectWrapperFactory) {
@@ -416,10 +380,6 @@ public class Configuration {
      */
     public List<Interceptor> getInterceptors() {
         return interceptorChain.getInterceptors();
-    }
-
-    public LanguageDriverRegistry getLanguageRegistry() {
-        return languageRegistry;
     }
 
     public void setDefaultScriptingLanguage(Class<?> driver) {
@@ -623,10 +583,6 @@ public class Configuration {
         return mappedStatements.get(id);
     }
 
-    public Map<String, XNode> getSqlFragments() {
-        return sqlFragments;
-    }
-
     public void addInterceptor(Interceptor interceptor) {
         interceptorChain.addInterceptor(interceptor);
     }
@@ -636,6 +592,7 @@ public class Configuration {
     }
 
     public void addMappers(String packageName) {
+        // 扫描该包下所有的 Mapper 接口，并添加到 mapperRegistry 中
         mapperRegistry.addMappers(packageName);
     }
 
