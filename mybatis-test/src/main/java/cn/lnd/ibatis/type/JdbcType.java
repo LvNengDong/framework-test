@@ -6,7 +6,7 @@ import java.util.Map;
 
 /**
  * @Author lnd
- * @Description
+ * @Description Jdbc Type 枚举
  * @Date 2024/9/19 00:13
  */
 public enum JdbcType {
@@ -54,16 +54,24 @@ public enum JdbcType {
     SQLXML(Types.SQLXML), // JDK6
     DATETIMEOFFSET(-155); // SQL Server 2008
 
+    /**
+     * 类型编号。嘿嘿，此处代码不规范
+     */
     public final int TYPE_CODE;
-    private static Map<Integer, JdbcType> codeLookup = new HashMap<Integer, cn.lnd.ibatis.type.JdbcType>();
+
+    /**
+     * 代码编号和 {@link JdbcType} 的映射
+     */
+    private static final Map<Integer, JdbcType> codeLookup = new HashMap<>();
 
     static {
-        for (cn.lnd.ibatis.type.JdbcType type : cn.lnd.ibatis.type.JdbcType.values()) {
+        for (JdbcType type : JdbcType.values()) {
             codeLookup.put(type.TYPE_CODE, type);
         }
     }
 
     JdbcType(int code) {
+        // 初始化 codeLookup
         this.TYPE_CODE = code;
     }
 
