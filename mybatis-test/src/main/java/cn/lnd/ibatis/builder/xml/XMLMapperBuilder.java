@@ -18,11 +18,13 @@ import java.util.*;
  * @Author lnd
  * @Description
  *      主要负责解析 Mapper 映射配置文件，形成 Builder 实例，为创建核心对象做准备
+ *
+ *      MyBatis 会为每个 Mapper.xml 映射文件创建一个 XMLMapperBuilder 实例完成解析
  * @Date 2024/9/18 23:54
  */
 public class XMLMapperBuilder extends BaseBuilder {
 
-    /* Java XPath 解析器 */
+    /* XML解析器 */
     private XPathParser parser;
 
     /* Mapper 构造器助手 */
@@ -66,19 +68,19 @@ public class XMLMapperBuilder extends BaseBuilder {
     public void parse() {
         // <1> 判断当前 Mapper 是否已经加载过
         if (!configuration.isResourceLoaded(resource)) {
-            // <2> 解析 `<mapper />` 节点【根节点】
+            // <2> 解析 `<mapper />` 节点【根节点】，获得整个 Mapper.xml 映射文件的内容
             configurationElement(parser.evalNode("/mapper"));
             // <3> 标记该 Mapper 已经加载过
             configuration.addLoadedResource(resource);
-            // <4> 绑定 Mapper
+            // <4> 绑定 Mapper（获取当前 Mapper.xml 映射文件指定的 Mapper 接口，并进行注册）
             bindMapperForNamespace();
         }
 
-        // <5> 解析待定的 <resultMap /> 节点
+        // <5> 解析待定的 <resultMap /> 节点（处理 configurationElement() 方法中解析失败的 <resultMap> 标签）
         parsePendingResultMaps();
-        // <6> 解析待定的 <cache-ref /> 节点
+        // <6> 解析待定的 <cache-ref /> 节点（处理 configurationElement() 方法中解析失败的 <cache-ref> 标签）
         parsePendingCacheRefs();
-        // <7> 解析待定的 SQL 语句的节点
+        // <7> 解析待定的 SQL 语句的节点（处理 configurationElement() 方法中解析失败的SQL 语句标签）
         parsePendingStatements();
     }
 
@@ -88,7 +90,8 @@ public class XMLMapperBuilder extends BaseBuilder {
 
 
     /**
-     * 解析Mapper节点*/
+     *  解析Mapper节点
+     * */
     private void configurationElement(XNode context) {
         try {
             // <1> 获得 namespace 属性
@@ -179,13 +182,17 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
 
     /**
-     * 解析 <cache /> 节点
-     *      <cache-ref /> 标签用于引用其他命名空间中定义的缓存配置，以便在当前命名空间中共享缓存。
-     *      通过 <cache-ref /> 标签，可以将当前命名空间中的查询结果缓存与其他命名空间中的缓存共享，避免重复缓存相同的数据，提高缓存的效率和一致性。
+     * 解析 <cache-ref/> 标签
+     *      <cache-ref/> 标签用于引用其他命名空间中定义的缓存配置，以便在当前命名空间中共享缓存。
+     *      通过 <cache-ref/> 标签，可以将当前命名空间中的查询结果缓存与其他命名空间中的缓存共享，避免重复缓存相同的数据，提高缓存的效率和一致性。
      * */
     private void cacheRefElement(XNode context) {
         if (context != null) {
             // <1> 获得 cache 指向的 namespace 名字，并添加到 configuration 的 cacheRefMap 中
+            /*
+                param1：当前 namespace 的名字，也就是当前命名空间中 cache 对象的 key（cache 对象是一个 Map 结构） @See Configuration#caches
+                param2：<cache-ref/> 标签中引用的其它 namespace 的名字，也就是其它前命名空间中 cache 对象的 key
+            */
             configuration.addCacheRef(builderAssistant.getCurrentNamespace(), context.getStringAttribute("namespace"));
             // <2> 创建 CacheRefResolver 对象，并执行解析
             CacheRefResolver cacheRefResolver = new CacheRefResolver(builderAssistant, context.getStringAttribute("namespace"));
@@ -200,9 +207,11 @@ public class XMLMapperBuilder extends BaseBuilder {
 
 
     /**
-     * 解析 <cache /> 节点
-     *      <cache /> 标签用于配置 MyBatis 的二级缓存，它可以提高查询性能，减少对数据库的访问次数。
-     *      当使用 <cache /> 标签配置了二级缓存后，查询结果将会被缓存在内存中，下次相同的查询可以直接从缓存中获取结果，而不需要再次访问数据库。
+     * 解析 <cache/> 标签
+     *      Cache 接口及其实现是MyBatis 一级缓存和二级缓存的基础，其中，一级缓存是默认开启的，而二级缓存默认情况下并没有开启，如有需要，可以通过标签为指定的namespace 开启二级缓存。
+     *
+     *      <cache/> 标签用于配置 MyBatis 的二级缓存，它可以提高查询性能，减少对数据库的访问次数。
+     *      当使用 <cache/> 标签配置了二级缓存后，查询结果将会被缓存在内存中，下次相同的查询可以直接从缓存中获取结果，而不需要再次访问数据库。
      * */
     private void cacheElement(XNode context) throws Exception {
         if (context != null) {
@@ -252,10 +261,10 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
 
     /**
-     * 解析 <resultMap /> 节点们
+     * 解析 <resultMap/> 节点们
      * */
     private void resultMapElements(List<XNode> list) throws Exception {
-        // 遍历 <resultMap /> 节点们
+        // 遍历 <resultMap/> 节点们
         for (XNode resultMapNode : list) {
             try {
                 // 处理单个 <resultMap /> 节点
@@ -271,13 +280,13 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
 
     /**
-     * 解析 <resultMap /> 节点
+     * 解析 <resultMap/> 标签
      * */
     private ResultMap resultMapElement(XNode resultMapNode, List<ResultMapping> additionalResultMappings) throws Exception {
         ErrorContext.instance().activity("processing " + resultMapNode.getValueBasedIdentifier());
-        // <1> 获得 id 属性
+        // <1> 获得 <resultMap> 标签的 id 属性，默认值会拼装所有父标签的id、value 或 property 属性值。
         String id = resultMapNode.getStringAttribute("id", resultMapNode.getValueBasedIdentifier());
-        // <1> 获得 type 属性
+        // <1> 获得 <resultMap> 标签的 type 属性值，这个值表示结果集将被映射成 type 指定类型的对象，如果没有指定 type 属性的话，会找其他属性值，优先级依次是：type、ofType、resultType、javaType。
         String type = resultMapNode.getStringAttribute("type",
                 resultMapNode.getStringAttribute("ofType",
                         resultMapNode.getStringAttribute("resultType",
@@ -290,6 +299,7 @@ public class XMLMapperBuilder extends BaseBuilder {
         Class<?> typeClass = resolveClass(type);
         Discriminator discriminator = null;
         // <2> 创建 ResultMapping 集合
+        // 解析<resultMap>标签下的各个子标签，每个子标签都会生成一个ResultMapping 对象，这个 ResultMapping 对象会被添加到resultMappings 集合（List<ResultMapping> 类型）中暂存
         List<ResultMapping> resultMappings = new ArrayList<>();
         resultMappings.addAll(additionalResultMappings);
         // <2> 遍历 <resultMap /> 的子节点
@@ -310,7 +320,7 @@ public class XMLMapperBuilder extends BaseBuilder {
                 resultMappings.add(buildResultMappingFromContext(resultChild, typeClass, flags));
             }
         }
-        // <3> 创建 ResultMapResolver 对象，执行解析
+        // <3> 创建 ResultMapResolver 对象，执行解析（ResultMapResolver 会根据上面解析到的 ResultMappings 集合以及 <resultMap> 标签的属性构造 ResultMap 对象，并将其添加到 Configuration.resultMaps 集合（StrictMap 类型）中）
         ResultMapResolver resultMapResolver = new ResultMapResolver(builderAssistant, id, typeClass, extend, discriminator, resultMappings, autoMapping);
         try {
             return resultMapResolver.resolve();

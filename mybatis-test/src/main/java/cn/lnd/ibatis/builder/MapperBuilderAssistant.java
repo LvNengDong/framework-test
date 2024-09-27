@@ -20,9 +20,9 @@ import java.util.*;
  * @Description     是 XMLMapperBuilder 和 MapperAnnotationBuilder 的小助手，提供了一些公用的方法，例如创建 ParameterMap、MappedStatement 对象等等
  * @Date 2024/9/19 15:20
  */
+@Getter
 public class MapperBuilderAssistant extends BaseBuilder {
 
-    @Getter
     private String currentNamespace;
     private String resource;
     private Cache currentCache;
@@ -111,6 +111,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
                 .blocking(blocking)
                 .properties(props)
                 .build();
+        // 创建 Cache 对象并添加到 Configuration.caches 集合中保存
         configuration.addCache(cache);
         currentCache = cache;
         return cache;

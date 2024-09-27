@@ -1,6 +1,7 @@
 package cn.lnd.ibatis.executor.loader.cglib;
 
 import cn.lnd.ibatis.executor.loader.*;
+import cn.lnd.ibatis.executor.loader.cglib.CglibSerialStateHolder;
 import cn.lnd.ibatis.io.Resources;
 import cn.lnd.ibatis.logging.Log;
 import cn.lnd.ibatis.logging.LogFactory;
@@ -23,7 +24,6 @@ import java.util.Set;
  */
 public class CglibProxyFactory implements ProxyFactory {
 
-    private static final Log log = LogFactory.getLog(cn.lnd.ibatis.executor.loader.cglib.CglibProxyFactory.class);
     private static final String FINALIZE_METHOD = "finalize";
     private static final String WRITE_REPLACE_METHOD = "writeReplace";
 
@@ -36,11 +36,11 @@ public class CglibProxyFactory implements ProxyFactory {
     }
 
     @Override
-    public Object createProxy(Object target, ResultLoaderMap lazyLoader, Configuration configuration, ObjectFactory objectFactory, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
+    public Object createProxy(Object target, cn.lnd.ibatis.executor.loader.ResultLoaderMap lazyLoader, cn.lnd.ibatis.session.Configuration configuration, cn.lnd.ibatis.reflection.factory.ObjectFactory objectFactory, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
         return cn.lnd.ibatis.executor.loader.cglib.CglibProxyFactory.EnhancedResultObjectProxyImpl.createProxy(target, lazyLoader, configuration, objectFactory, constructorArgTypes, constructorArgs);
     }
 
-    public Object createDeserializationProxy(Object target, Map<String, ResultLoaderMap.LoadPair> unloadedProperties, ObjectFactory objectFactory, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
+    public Object createDeserializationProxy(Object target, Map<String, cn.lnd.ibatis.executor.loader.ResultLoaderMap.LoadPair> unloadedProperties, cn.lnd.ibatis.reflection.factory.ObjectFactory objectFactory, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
         return cn.lnd.ibatis.executor.loader.cglib.CglibProxyFactory.EnhancedDeserializationProxyImpl.createProxy(target, unloadedProperties, objectFactory, constructorArgTypes, constructorArgs);
     }
 
@@ -56,11 +56,11 @@ public class CglibProxyFactory implements ProxyFactory {
         try {
             type.getDeclaredMethod(WRITE_REPLACE_METHOD);
             // ObjectOutputStream will call writeReplace of objects returned by writeReplace
-            if (log.isDebugEnabled()) {
-                log.debug(WRITE_REPLACE_METHOD + " method was found on bean " + type + ", make sure it returns this");
+            if (cn.lnd.ibatis.executor.loader.cglib.CglibProxyFactory.LogHolder.log.isDebugEnabled()) {
+                cn.lnd.ibatis.executor.loader.cglib.CglibProxyFactory.LogHolder.log.debug(WRITE_REPLACE_METHOD + " method was found on bean " + type + ", make sure it returns this");
             }
         } catch (NoSuchMethodException e) {
-            enhancer.setInterfaces(new Class[]{WriteReplaceInterface.class});
+            enhancer.setInterfaces(new Class[]{cn.lnd.ibatis.executor.loader.WriteReplaceInterface.class});
         } catch (SecurityException e) {
             // nothing to do here
         }
@@ -78,14 +78,14 @@ public class CglibProxyFactory implements ProxyFactory {
     private static class EnhancedResultObjectProxyImpl implements MethodInterceptor {
 
         private final Class<?> type;
-        private final ResultLoaderMap lazyLoader;
+        private final cn.lnd.ibatis.executor.loader.ResultLoaderMap lazyLoader;
         private final boolean aggressive;
         private final Set<String> lazyLoadTriggerMethods;
-        private final ObjectFactory objectFactory;
+        private final cn.lnd.ibatis.reflection.factory.ObjectFactory objectFactory;
         private final List<Class<?>> constructorArgTypes;
         private final List<Object> constructorArgs;
 
-        private EnhancedResultObjectProxyImpl(Class<?> type, ResultLoaderMap lazyLoader, Configuration configuration, ObjectFactory objectFactory, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
+        private EnhancedResultObjectProxyImpl(Class<?> type, cn.lnd.ibatis.executor.loader.ResultLoaderMap lazyLoader, cn.lnd.ibatis.session.Configuration configuration, cn.lnd.ibatis.reflection.factory.ObjectFactory objectFactory, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
             this.type = type;
             this.lazyLoader = lazyLoader;
             this.aggressive = configuration.isAggressiveLazyLoading();
@@ -95,11 +95,11 @@ public class CglibProxyFactory implements ProxyFactory {
             this.constructorArgs = constructorArgs;
         }
 
-        public static Object createProxy(Object target, ResultLoaderMap lazyLoader, Configuration configuration, ObjectFactory objectFactory, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
+        public static Object createProxy(Object target, cn.lnd.ibatis.executor.loader.ResultLoaderMap lazyLoader, Configuration configuration, cn.lnd.ibatis.reflection.factory.ObjectFactory objectFactory, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
             final Class<?> type = target.getClass();
             cn.lnd.ibatis.executor.loader.cglib.CglibProxyFactory.EnhancedResultObjectProxyImpl callback = new cn.lnd.ibatis.executor.loader.cglib.CglibProxyFactory.EnhancedResultObjectProxyImpl(type, lazyLoader, configuration, objectFactory, constructorArgTypes, constructorArgs);
             Object enhanced = crateProxy(type, callback, constructorArgTypes, constructorArgs);
-            PropertyCopier.copyBeanProperties(type, target, enhanced);
+            cn.lnd.ibatis.reflection.property.PropertyCopier.copyBeanProperties(type, target, enhanced);
             return enhanced;
         }
 
@@ -115,9 +115,9 @@ public class CglibProxyFactory implements ProxyFactory {
                         } else {
                             original = objectFactory.create(type, constructorArgTypes, constructorArgs);
                         }
-                        PropertyCopier.copyBeanProperties(type, enhanced, original);
+                        cn.lnd.ibatis.reflection.property.PropertyCopier.copyBeanProperties(type, enhanced, original);
                         if (lazyLoader.size() > 0) {
-                            return new CglibSerialStateHolder(original, lazyLoader.getProperties(), objectFactory, constructorArgTypes, constructorArgs);
+                            return new cn.lnd.ibatis.executor.loader.cglib.CglibSerialStateHolder(original, lazyLoader.getProperties(), objectFactory, constructorArgTypes, constructorArgs);
                         } else {
                             return original;
                         }
@@ -125,7 +125,10 @@ public class CglibProxyFactory implements ProxyFactory {
                         if (lazyLoader.size() > 0 && !FINALIZE_METHOD.equals(methodName)) {
                             if (aggressive || lazyLoadTriggerMethods.contains(methodName)) {
                                 lazyLoader.loadAll();
-                            } else if (PropertyNamer.isGetter(methodName)) {
+                            } else if (cn.lnd.ibatis.reflection.property.PropertyNamer.isSetter(methodName)) {
+                                final String property = cn.lnd.ibatis.reflection.property.PropertyNamer.methodToProperty(methodName);
+                                lazyLoader.remove(property);
+                            } else if (cn.lnd.ibatis.reflection.property.PropertyNamer.isGetter(methodName)) {
                                 final String property = PropertyNamer.methodToProperty(methodName);
                                 if (lazyLoader.hasLoader(property)) {
                                     lazyLoader.load(property);
@@ -141,14 +144,14 @@ public class CglibProxyFactory implements ProxyFactory {
         }
     }
 
-    private static class EnhancedDeserializationProxyImpl extends AbstractEnhancedDeserializationProxy implements MethodInterceptor {
+    private static class EnhancedDeserializationProxyImpl extends cn.lnd.ibatis.executor.loader.AbstractEnhancedDeserializationProxy implements MethodInterceptor {
 
-        private EnhancedDeserializationProxyImpl(Class<?> type, Map<String, ResultLoaderMap.LoadPair> unloadedProperties, ObjectFactory objectFactory,
+        private EnhancedDeserializationProxyImpl(Class<?> type, Map<String, cn.lnd.ibatis.executor.loader.ResultLoaderMap.LoadPair> unloadedProperties, cn.lnd.ibatis.reflection.factory.ObjectFactory objectFactory,
                                                  List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
             super(type, unloadedProperties, objectFactory, constructorArgTypes, constructorArgs);
         }
 
-        public static Object createProxy(Object target, Map<String, ResultLoaderMap.LoadPair> unloadedProperties, ObjectFactory objectFactory,
+        public static Object createProxy(Object target, Map<String, cn.lnd.ibatis.executor.loader.ResultLoaderMap.LoadPair> unloadedProperties, cn.lnd.ibatis.reflection.factory.ObjectFactory objectFactory,
                                          List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
             final Class<?> type = target.getClass();
             cn.lnd.ibatis.executor.loader.cglib.CglibProxyFactory.EnhancedDeserializationProxyImpl callback = new cn.lnd.ibatis.executor.loader.cglib.CglibProxyFactory.EnhancedDeserializationProxyImpl(type, unloadedProperties, objectFactory, constructorArgTypes, constructorArgs);
@@ -160,13 +163,18 @@ public class CglibProxyFactory implements ProxyFactory {
         @Override
         public Object intercept(Object enhanced, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
             final Object o = super.invoke(enhanced, method, args);
-            return (o instanceof AbstractSerialStateHolder) ? o : methodProxy.invokeSuper(o, args);
+            return o instanceof cn.lnd.ibatis.executor.loader.AbstractSerialStateHolder ? o : methodProxy.invokeSuper(o, args);
         }
 
         @Override
-        protected AbstractSerialStateHolder newSerialStateHolder(Object userBean, Map<String, ResultLoaderMap.LoadPair> unloadedProperties, ObjectFactory objectFactory,
-                                                                 List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
-            return new CglibSerialStateHolder(userBean, unloadedProperties, objectFactory, constructorArgTypes, constructorArgs);
+        protected cn.lnd.ibatis.executor.loader.AbstractSerialStateHolder newSerialStateHolder(Object userBean, Map<String, cn.lnd.ibatis.executor.loader.ResultLoaderMap.LoadPair> unloadedProperties, ObjectFactory objectFactory,
+                                                                                                   List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
+            return new cn.lnd.ibatis.executor.loader.cglib.CglibSerialStateHolder(userBean, unloadedProperties, objectFactory, constructorArgTypes, constructorArgs);
         }
     }
+
+    private static class LogHolder {
+        private static final Log log = LogFactory.getLog(cn.lnd.ibatis.executor.loader.cglib.CglibProxyFactory.class);
+    }
+
 }

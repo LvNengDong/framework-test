@@ -16,6 +16,9 @@ import java.util.Properties;
 /**
  * @Author lnd
  * @Description
+ *      在实际应用中，我们会在 <sql/> 标签中定义一些可重用的 SQL 片段，以便在其它语句中使用。
+ *      所以在真正解析某个SQL标签（<select/>、<insert/>等）之前，MyBatis 会先将 SQL 标签中的 <include> 标签转换成对应的 SQL 片段（即定义在 <sql> 标签内的文本）
+ *      这个转换过程是在 XMLIncludeTransformer.applyIncludes() 方法中实现的（其中不仅包含了 <include> 标签的处理，还包含了“${}”占位符的处理）
  * @Date 2024/9/19 16:52
  */
 public class XMLIncludeTransformer {
@@ -28,6 +31,11 @@ public class XMLIncludeTransformer {
         this.builderAssistant = builderAssistant;
     }
 
+    /**
+     * 将引用的 <include/> 标签转换成 sql 代码段
+     *
+     * @param source 某个SQL标签（<select/>、<insert/>等）
+     */
     public void applyIncludes(Node source) {
         Properties variablesContext = new Properties();
         Properties configurationVariables = configuration.getVariables();
@@ -38,12 +46,14 @@ public class XMLIncludeTransformer {
     }
 
     /**
-     * Recursively apply includes through all SQL fragments.
-     * @param source Include node in DOM tree
-     * @param variablesContext Current context for static variables with values
+     *
+     * @param source 某个SQL标签（<select/>、<insert/>等）
+     * @param variablesContext 配置属性上下文
+     * @param included
      */
     private void applyIncludes(Node source, final Properties variablesContext, boolean included) {
-        if (source.getNodeName().equals("include")) {
+        if (source.getNodeName().equals("include")) { // SQL 语句中含有 include 标签
+            //查找 refid 属性指向的 <sql> 标签，得到其对应的 Node 对象
             Node toInclude = findSqlFragment(getStringAttribute(source, "refid"), variablesContext);
             Properties toIncludeContext = getVariablesContext(source, variablesContext);
             applyIncludes(toInclude, toIncludeContext, true);

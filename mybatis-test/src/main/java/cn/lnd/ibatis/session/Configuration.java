@@ -121,6 +121,10 @@ public class Configuration {
     @Getter
     protected AutoMappingUnknownColumnBehavior autoMappingUnknownColumnBehavior = AutoMappingUnknownColumnBehavior.NONE;
 
+    /**
+     * 来源：
+     *  1、mybatis-config.xml 配置文件中，通过 <properties> 子标签配置的 KV 键值对
+     * */
     @Getter
     protected Properties variables = new Properties();
     @Getter
@@ -165,6 +169,9 @@ public class Configuration {
      * KEY：命名空间 namespace
      */
     protected final Map<String, Cache> caches = new Configuration.StrictMap<>("Caches collection");
+    /**
+     * <resultMap/> 标签中的数据
+     * */
     protected final Map<String, ResultMap> resultMaps = new Configuration.StrictMap<>("Result Maps collection");
     protected final Map<String, ParameterMap> parameterMaps = new Configuration.StrictMap<>("Parameter Maps collection");
     protected final Map<String, KeyGenerator> keyGenerators = new Configuration.StrictMap<>("Key Generators collection");
@@ -186,11 +193,9 @@ public class Configuration {
     protected final Collection<MethodResolver> incompleteMethods = new LinkedList<>();
 
     /*
-     * A map holds cache-ref relationship. The key is the namespace that
-     * references a cache bound to another namespace and the value is the
-     * namespace which the actual cache is bound to.
-     *
-     * Cache 指向的映射
+     *  Key 是 <cache-ref> 标签所属的namespace 标识
+     *  Value 值是 <cache-ref> 标签引用的 namespace 值
+     *  这样的话，就可以将两个namespace 关联起来了，即这两个 namespace 共用一个 Cache对象。
      */
     protected final Map<String, String> cacheRefMap = new HashMap<>();
 

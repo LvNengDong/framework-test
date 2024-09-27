@@ -12,7 +12,7 @@ import java.util.List;
  * @Date 2024/9/19 16:56
  */
 public class ResultMapResolver {
-    private final cn.lnd.ibatis.builder.MapperBuilderAssistant assistant;
+    private final MapperBuilderAssistant assistant;
     private String id;
     private Class<?> type;
     private String extend;

@@ -1,5 +1,7 @@
 package cn.lnd.ibatis.scripting.xmltags;
 
+import ognl.Ognl;
+import ognl.OgnlException;
 import cn.lnd.ibatis.builder.BuilderException;
 
 import java.util.Map;
@@ -12,7 +14,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class OgnlCache {
 
-    private static final Map<String, Object> expressionCache = new ConcurrentHashMap<String, Object>();
+    private static final cn.lnd.ibatis.scripting.xmltags.OgnlMemberAccess MEMBER_ACCESS = new cn.lnd.ibatis.scripting.xmltags.OgnlMemberAccess();
+    private static final cn.lnd.ibatis.scripting.xmltags.OgnlClassResolver CLASS_RESOLVER = new OgnlClassResolver();
+    private static final Map<String, Object> expressionCache = new ConcurrentHashMap<>();
 
     private OgnlCache() {
         // Prevent Instantiation of Static Class
@@ -20,7 +24,7 @@ public final class OgnlCache {
 
     public static Object getValue(String expression, Object root) {
         try {
-            Map<Object, OgnlClassResolver> context = Ognl.createDefaultContext(root, new OgnlClassResolver());
+            Map context = Ognl.createDefaultContext(root, MEMBER_ACCESS, CLASS_RESOLVER, null);
             return Ognl.getValue(parseExpression(expression), context, root);
         } catch (OgnlException e) {
             throw new BuilderException("Error evaluating expression '" + expression + "'. Cause: " + e, e);

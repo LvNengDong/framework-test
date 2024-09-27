@@ -138,6 +138,10 @@ public abstract class BaseBuilder {
         }
     }
 
+    /**
+     * 通过别名或全限定类名，得到对应的 Class
+     * @param alias 别名或全限定类名
+     */
     protected <T> Class<? extends T> resolveClass(String alias) {
         if (alias == null) {
             return null;

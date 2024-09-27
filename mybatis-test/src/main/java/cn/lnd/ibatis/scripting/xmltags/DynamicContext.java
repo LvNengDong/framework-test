@@ -1,5 +1,8 @@
 package cn.lnd.ibatis.scripting.xmltags;
 
+import ognl.OgnlContext;
+import ognl.OgnlRuntime;
+import ognl.PropertyAccessor;
 import cn.lnd.ibatis.reflection.MetaObject;
 import cn.lnd.ibatis.session.Configuration;
 
@@ -17,19 +20,19 @@ public class DynamicContext {
     public static final String DATABASE_ID_KEY = "_databaseId";
 
     static {
-        OgnlRuntime.setPropertyAccessor(cn.lnd.ibatis.scripting.xmltags.DynamicContext.ContextMap.class, new cn.lnd.ibatis.scripting.xmltags.DynamicContext.ContextAccessor());
+        OgnlRuntime.setPropertyAccessor(DynamicContext.ContextMap.class, new DynamicContext.ContextAccessor());
     }
 
-    private final cn.lnd.ibatis.scripting.xmltags.DynamicContext.ContextMap bindings;
+    private final DynamicContext.ContextMap bindings;
     private final StringBuilder sqlBuilder = new StringBuilder();
     private int uniqueNumber = 0;
 
     public DynamicContext(Configuration configuration, Object parameterObject) {
         if (parameterObject != null && !(parameterObject instanceof Map)) {
-            MetaObject metaObject = configuration.newMetaObject(parameterObject);
-            bindings = new cn.lnd.ibatis.scripting.xmltags.DynamicContext.ContextMap(metaObject);
+            cn.lnd.ibatis.reflection.MetaObject metaObject = configuration.newMetaObject(parameterObject);
+            bindings = new DynamicContext.ContextMap(metaObject);
         } else {
-            bindings = new cn.lnd.ibatis.scripting.xmltags.DynamicContext.ContextMap(null);
+            bindings = new DynamicContext.ContextMap(null);
         }
         bindings.put(PARAMETER_OBJECT_KEY, parameterObject);
         bindings.put(DATABASE_ID_KEY, configuration.getDatabaseId());
@@ -59,7 +62,7 @@ public class DynamicContext {
     static class ContextMap extends HashMap<String, Object> {
         private static final long serialVersionUID = 2977601501966151582L;
 
-        private MetaObject parameterMetaObject;
+        private cn.lnd.ibatis.reflection.MetaObject parameterMetaObject;
         public ContextMap(MetaObject parameterMetaObject) {
             this.parameterMetaObject = parameterMetaObject;
         }
@@ -83,8 +86,7 @@ public class DynamicContext {
     static class ContextAccessor implements PropertyAccessor {
 
         @Override
-        public Object getProperty(Map context, Object target, Object name)
-                throws OgnlException {
+        public Object getProperty(Map context, Object target, Object name) {
             Map map = (Map) target;
 
             Object result = map.get(name);
@@ -101,8 +103,7 @@ public class DynamicContext {
         }
 
         @Override
-        public void setProperty(Map context, Object target, Object name, Object value)
-                throws OgnlException {
+        public void setProperty(Map context, Object target, Object name, Object value) {
             Map<Object, Object> map = (Map<Object, Object>) target;
             map.put(name, value);
         }

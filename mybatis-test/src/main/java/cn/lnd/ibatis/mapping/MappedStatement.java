@@ -19,51 +19,56 @@ import java.util.List;
  * @Description
  * @Date 2024/9/19 11:28
  */
+@Getter
 public class MappedStatement {
 
-    @Getter
+    
     private String resource;
-    @Getter
+    
     private Configuration configuration;
-    @Getter
+    
     private String id;
-    @Getter
+    
     private Integer fetchSize;
-    @Getter
+    
     private Integer timeout;
-    @Getter
+    
     private StatementType statementType;
-    @Getter
+    
     private ResultSetType resultSetType;
+
+    // SQL 标签中定义的 SQL 语句（解析前，即未解析占位符）
     private SqlSource sqlSource;
-    @Getter
+    
     private Cache cache;
-    @Getter
+    
     private ParameterMap parameterMap;
-    @Getter
+    
     private List<ResultMap> resultMaps;
-    @Getter
+    
     private boolean flushCacheRequired;
-    @Getter
+    
     private boolean useCache;
-    @Getter
+    
     private boolean resultOrdered;
-    @Getter
+    
+    
+    /*  SQL 语句的类型（INSERT、UPDATE、DELETE、SELECT 或 FLUSH 类型） */
     private SqlCommandType sqlCommandType;
-    @Getter
+    
     private KeyGenerator keyGenerator;
-    @Getter
+    
     private String[] keyProperties;
-    @Getter
+    
     private String[] keyColumns;
     private boolean hasNestedResultMaps;
-    @Getter
+    
     private String databaseId;
-    @Getter
+    
     private Log statementLog;
-    @Getter
+    
     private LanguageDriver lang;
-    @Getter
+    
     private String[] resultSets;
 
     MappedStatement() {

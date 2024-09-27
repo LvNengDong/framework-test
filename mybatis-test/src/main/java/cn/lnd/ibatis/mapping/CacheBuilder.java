@@ -16,7 +16,8 @@ import java.util.Properties;
 
 /**
  * @Author lnd
- * @Description Cache 构造器。基于装饰者设计模式，进行 Cache 对象的构造。
+ * @Description
+ *      Cache 构造器。基于装饰者设计模式，进行 Cache 对象的构造。
  * @Date 2024/9/19 17:30
  */
 public class CacheBuilder {

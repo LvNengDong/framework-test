@@ -40,11 +40,11 @@ public class XMLConfigBuilder extends BaseBuilder {
 
     /* 是否已解析 */
     private boolean parsed;
-    /* Java XPath 解析器 */
+    /* XML 解析器 */
     private final XPathParser parser;
-    /* 环境 */
+    /* 环境 (pord、dev、test等等)*/
     private String environment;
-    /* ReflectorFactory 对象 (主要用于实现对 Reflector 对象的创建和缓存）*/
+    /* ReflectorFactory 对象 (主要用于操作 Reflector 对象的创建和缓存）*/
     private final ReflectorFactory localReflectorFactory = new DefaultReflectorFactory();
 
     public XMLConfigBuilder(Reader reader) {
@@ -137,6 +137,9 @@ public class XMLConfigBuilder extends BaseBuilder {
         }
     }
 
+    /*
+    * 处理<settings>标签的所有子标签，也就是<setting>标签，将其name属性和value属性整理到Properties对象中保存
+    * */
     private Properties settingsAsProperties(XNode context) {
         if (context == null) {
             return new Properties();
@@ -173,6 +176,9 @@ public class XMLConfigBuilder extends BaseBuilder {
         }
     }
 
+    /**
+     * 处理 <typeAliases> 标签，解析得到的别名信息会记录到 TypeAliasRegistry 中
+     */
     private void typeAliasesElement(XNode parent) {
         if (parent != null) {
             // 遍历子节点
@@ -202,6 +208,10 @@ public class XMLConfigBuilder extends BaseBuilder {
         }
     }
 
+    /**
+     *    MyBatis 是一个非常易于扩展的持久层框架，而插件就是 MyBatis 提供的一种重要扩展机制。
+     *    我们可以自定义一个实现了 Interceptor 接口的插件来扩展 MyBatis 的行为，或是拦截 MyBatis 的一些默认行为。
+     * */
     private void pluginElement(XNode parent) throws Exception {
         if (parent != null) {
             // 遍历 <plugins /> 标签
