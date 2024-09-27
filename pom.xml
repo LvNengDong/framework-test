@@ -22,6 +22,7 @@
         <module>netty-test</module>
         <module>tomcat-test</module>
         <module>XPath-test</module>
+        <module>jdbc-test</module>
     </modules>
 
     <properties>

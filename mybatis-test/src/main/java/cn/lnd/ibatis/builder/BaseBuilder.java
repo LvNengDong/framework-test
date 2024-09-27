@@ -138,14 +138,14 @@ public abstract class BaseBuilder {
         }
     }
 
-    protected Class<?> resolveClass(String alias) {
+    protected <T> Class<? extends T> resolveClass(String alias) {
         if (alias == null) {
             return null;
         }
         try {
             return resolveAlias(alias);
         } catch (Exception e) {
-            throw new BuilderException("Error resolving class. Cause: " + e, e);
+            throw new org.apache.ibatis.builder.BuilderException("Error resolving class. Cause: " + e, e);
         }
     }
 
@@ -187,7 +187,7 @@ public abstract class BaseBuilder {
     /**
      * 从 typeAliasRegistry 中，通过别名或类全名，获得对应的类
      */
-    protected Class<?> resolveAlias(String alias) {
+    protected <T> Class<? extends T> resolveAlias(String alias) {
         return typeAliasRegistry.resolveAlias(alias);
     }
 }

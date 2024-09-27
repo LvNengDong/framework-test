@@ -17,6 +17,9 @@ import java.util.Locale;
 /**
  * @Author lnd
  * @Description
+ *
+ *      主要负责解析 Statement 配置，即 <select />、<insert />、<update />、<delete /> 标签。
+ *
  * @Date 2024/9/19 16:55
  */
 public class XMLStatementBuilder extends BaseBuilder {
@@ -175,7 +178,7 @@ public class XMLStatementBuilder extends BaseBuilder {
     }
 
     private LanguageDriver getLanguageDriver(String lang) {
-        Class<?> langClass = null;
+        Class<? extends LanguageDriver> langClass = null;
         if (lang != null) {
             langClass = resolveClass(lang);
         }

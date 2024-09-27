@@ -1,12 +1,15 @@
 package cn.lnd.ibatis.builder.annotation;
 
 import cn.lnd.ibatis.annotations.*;
-import cn.lnd.ibatis.annotations.ResultMap;
+import cn.lnd.ibatis.mapping.*;
 import cn.lnd.ibatis.binding.BindingException;
 import cn.lnd.ibatis.binding.MapperMethod;
 import cn.lnd.ibatis.builder.BuilderException;
+import cn.lnd.ibatis.builder.CacheRefResolver;
 import cn.lnd.ibatis.builder.IncompleteElementException;
 import cn.lnd.ibatis.builder.MapperBuilderAssistant;
+import cn.lnd.ibatis.builder.annotation.MethodResolver;
+import cn.lnd.ibatis.builder.annotation.ProviderSqlSource;
 import cn.lnd.ibatis.builder.xml.XMLMapperBuilder;
 import cn.lnd.ibatis.cursor.Cursor;
 import cn.lnd.ibatis.executor.keygen.Jdbc3KeyGenerator;
@@ -14,7 +17,8 @@ import cn.lnd.ibatis.executor.keygen.KeyGenerator;
 import cn.lnd.ibatis.executor.keygen.NoKeyGenerator;
 import cn.lnd.ibatis.executor.keygen.SelectKeyGenerator;
 import cn.lnd.ibatis.io.Resources;
-import cn.lnd.ibatis.mapping.*;
+import cn.lnd.ibatis.mapping.MappedStatement;
+import cn.lnd.ibatis.mapping.ResultMap;
 import cn.lnd.ibatis.parsing.PropertyParser;
 import cn.lnd.ibatis.reflection.TypeParameterResolver;
 import cn.lnd.ibatis.scripting.LanguageDriver;
@@ -38,28 +42,30 @@ import java.util.*;
  */
 public class MapperAnnotationBuilder {
 
-    private final Set<Class<? extends Annotation>> sqlAnnotationTypes = new HashSet<Class<? extends Annotation>>();
-    private final Set<Class<? extends Annotation>> sqlProviderAnnotationTypes = new HashSet<Class<? extends Annotation>>();
+    private static final Set<Class<? extends Annotation>> SQL_ANNOTATION_TYPES = new HashSet<>();
+    private static final Set<Class<? extends Annotation>> SQL_PROVIDER_ANNOTATION_TYPES = new HashSet<>();
 
-    private Configuration configuration;
-    private MapperBuilderAssistant assistant;
-    private Class<?> type;
+    private final cn.lnd.ibatis.session.Configuration configuration;
+    private final cn.lnd.ibatis.builder.MapperBuilderAssistant assistant;
+    private final Class<?> type;
+
+    static {
+        SQL_ANNOTATION_TYPES.add(Select.class);
+        SQL_ANNOTATION_TYPES.add(Insert.class);
+        SQL_ANNOTATION_TYPES.add(Update.class);
+        SQL_ANNOTATION_TYPES.add(Delete.class);
+
+        SQL_PROVIDER_ANNOTATION_TYPES.add(SelectProvider.class);
+        SQL_PROVIDER_ANNOTATION_TYPES.add(InsertProvider.class);
+        SQL_PROVIDER_ANNOTATION_TYPES.add(UpdateProvider.class);
+        SQL_PROVIDER_ANNOTATION_TYPES.add(DeleteProvider.class);
+    }
 
     public MapperAnnotationBuilder(Configuration configuration, Class<?> type) {
         String resource = type.getName().replace('.', '/') + ".java (best guess)";
         this.assistant = new MapperBuilderAssistant(configuration, resource);
         this.configuration = configuration;
         this.type = type;
-
-        sqlAnnotationTypes.add(Select.class);
-        sqlAnnotationTypes.add(Insert.class);
-        sqlAnnotationTypes.add(Update.class);
-        sqlAnnotationTypes.add(Delete.class);
-
-        sqlProviderAnnotationTypes.add(SelectProvider.class);
-        sqlProviderAnnotationTypes.add(InsertProvider.class);
-        sqlProviderAnnotationTypes.add(UpdateProvider.class);
-        sqlProviderAnnotationTypes.add(DeleteProvider.class);
     }
 
     public void parse() {
@@ -77,8 +83,8 @@ public class MapperAnnotationBuilder {
                     if (!method.isBridge()) {
                         parseStatement(method);
                     }
-                } catch (IncompleteElementException e) {
-                    configuration.addIncompleteMethod(new MethodResolver(this, method));
+                } catch (cn.lnd.ibatis.builder.IncompleteElementException e) {
+                    configuration.addIncompleteMethod(new cn.lnd.ibatis.builder.annotation.MethodResolver(this, method));
                 }
             }
         }
@@ -86,14 +92,14 @@ public class MapperAnnotationBuilder {
     }
 
     private void parsePendingMethods() {
-        Collection<MethodResolver> incompleteMethods = configuration.getIncompleteMethods();
+        Collection<cn.lnd.ibatis.builder.annotation.MethodResolver> incompleteMethods = configuration.getIncompleteMethods();
         synchronized (incompleteMethods) {
             Iterator<MethodResolver> iter = incompleteMethods.iterator();
             while (iter.hasNext()) {
                 try {
                     iter.next().resolve();
                     iter.remove();
-                } catch (IncompleteElementException e) {
+                } catch (cn.lnd.ibatis.builder.IncompleteElementException e) {
                     // This method is still missing a resource
                 }
             }
@@ -106,14 +112,18 @@ public class MapperAnnotationBuilder {
         // this flag is set at XMLMapperBuilder#bindMapperForNamespace
         if (!configuration.isResourceLoaded("namespace:" + type.getName())) {
             String xmlResource = type.getName().replace('.', '/') + ".xml";
-            InputStream inputStream = null;
-            try {
-                inputStream = Resources.getResourceAsStream(type.getClassLoader(), xmlResource);
-            } catch (IOException e) {
-                // ignore, resource is not required
+            // #1347
+            InputStream inputStream = type.getResourceAsStream("/" + xmlResource);
+            if (inputStream == null) {
+                // Search XML mapper that is not in the module but in the classpath.
+                try {
+                    inputStream = Resources.getResourceAsStream(type.getClassLoader(), xmlResource);
+                } catch (IOException e2) {
+                    // ignore, resource is not required
+                }
             }
             if (inputStream != null) {
-                XMLMapperBuilder xmlParser = new XMLMapperBuilder(inputStream, assistant.getConfiguration(), xmlResource, configuration.getSqlFragments(), type.getName());
+                cn.lnd.ibatis.builder.xml.XMLMapperBuilder xmlParser = new XMLMapperBuilder(inputStream, assistant.getConfiguration(), xmlResource, configuration.getSqlFragments(), type.getName());
                 xmlParser.parse();
             }
         }
@@ -147,13 +157,17 @@ public class MapperAnnotationBuilder {
             Class<?> refType = cacheDomainRef.value();
             String refName = cacheDomainRef.name();
             if (refType == void.class && refName.isEmpty()) {
-                throw new BuilderException("Should be specified either value() or name() attribute in the @CacheNamespaceRef");
+                throw new cn.lnd.ibatis.builder.BuilderException("Should be specified either value() or name() attribute in the @CacheNamespaceRef");
             }
             if (refType != void.class && !refName.isEmpty()) {
-                throw new BuilderException("Cannot use both value() and name() attribute in the @CacheNamespaceRef");
+                throw new cn.lnd.ibatis.builder.BuilderException("Cannot use both value() and name() attribute in the @CacheNamespaceRef");
             }
             String namespace = (refType != void.class) ? refType.getName() : refName;
-            assistant.useCacheRef(namespace);
+            try {
+                assistant.useCacheRef(namespace);
+            } catch (IncompleteElementException e) {
+                configuration.addIncompleteCacheRef(new CacheRefResolver(assistant, namespace));
+            }
         }
     }
 
@@ -184,10 +198,10 @@ public class MapperAnnotationBuilder {
     }
 
     private void applyResultMap(String resultMapId, Class<?> returnType, Arg[] args, Result[] results, TypeDiscriminator discriminator) {
-        List<ResultMapping> resultMappings = new ArrayList<ResultMapping>();
+        List<cn.lnd.ibatis.mapping.ResultMapping> resultMappings = new ArrayList<>();
         applyConstructorArgs(args, returnType, resultMappings);
         applyResults(results, returnType, resultMappings);
-        Discriminator disc = applyDiscriminator(resultMapId, returnType, discriminator);
+        cn.lnd.ibatis.mapping.Discriminator disc = applyDiscriminator(resultMapId, returnType, discriminator);
         // TODO add AutoMappingBehaviour
         assistant.addResultMap(resultMapId, returnType, null, disc, resultMappings, null);
         createDiscriminatorResultMaps(resultMapId, returnType, discriminator);
@@ -197,7 +211,7 @@ public class MapperAnnotationBuilder {
         if (discriminator != null) {
             for (Case c : discriminator.cases()) {
                 String caseResultMapId = resultMapId + "-" + c.value();
-                List<ResultMapping> resultMappings = new ArrayList<ResultMapping>();
+                List<cn.lnd.ibatis.mapping.ResultMapping> resultMappings = new ArrayList<>();
                 // issue #136
                 applyConstructorArgs(c.constructArgs(), resultType, resultMappings);
                 applyResults(c.results(), resultType, resultMappings);
@@ -207,16 +221,16 @@ public class MapperAnnotationBuilder {
         }
     }
 
-    private Discriminator applyDiscriminator(String resultMapId, Class<?> resultType, TypeDiscriminator discriminator) {
+    private cn.lnd.ibatis.mapping.Discriminator applyDiscriminator(String resultMapId, Class<?> resultType, TypeDiscriminator discriminator) {
         if (discriminator != null) {
             String column = discriminator.column();
             Class<?> javaType = discriminator.javaType() == void.class ? String.class : discriminator.javaType();
-            JdbcType jdbcType = discriminator.jdbcType() == JdbcType.UNDEFINED ? null : discriminator.jdbcType();
+            cn.lnd.ibatis.type.JdbcType jdbcType = discriminator.jdbcType() == cn.lnd.ibatis.type.JdbcType.UNDEFINED ? null : discriminator.jdbcType();
             @SuppressWarnings("unchecked")
-            Class<? extends TypeHandler<?>> typeHandler = (Class<? extends TypeHandler<?>>)
-                    (discriminator.typeHandler() == UnknownTypeHandler.class ? null : discriminator.typeHandler());
+            Class<? extends cn.lnd.ibatis.type.TypeHandler<?>> typeHandler = (Class<? extends cn.lnd.ibatis.type.TypeHandler<?>>)
+                    (discriminator.typeHandler() == cn.lnd.ibatis.type.UnknownTypeHandler.class ? null : discriminator.typeHandler());
             Case[] cases = discriminator.cases();
-            Map<String, String> discriminatorMap = new HashMap<String, String>();
+            Map<String, String> discriminatorMap = new HashMap<>();
             for (Case c : cases) {
                 String value = c.value();
                 String caseResultMapId = resultMapId + "-" + value;
@@ -229,38 +243,38 @@ public class MapperAnnotationBuilder {
 
     void parseStatement(Method method) {
         Class<?> parameterTypeClass = getParameterType(method);
-        LanguageDriver languageDriver = getLanguageDriver(method);
-        SqlSource sqlSource = getSqlSourceFromAnnotations(method, parameterTypeClass, languageDriver);
+        cn.lnd.ibatis.scripting.LanguageDriver languageDriver = getLanguageDriver(method);
+        cn.lnd.ibatis.mapping.SqlSource sqlSource = getSqlSourceFromAnnotations(method, parameterTypeClass, languageDriver);
         if (sqlSource != null) {
             Options options = method.getAnnotation(Options.class);
             final String mappedStatementId = type.getName() + "." + method.getName();
             Integer fetchSize = null;
             Integer timeout = null;
-            StatementType statementType = StatementType.PREPARED;
-            ResultSetType resultSetType = ResultSetType.FORWARD_ONLY;
-            SqlCommandType sqlCommandType = getSqlCommandType(method);
-            boolean isSelect = sqlCommandType == SqlCommandType.SELECT;
+            cn.lnd.ibatis.mapping.StatementType statementType = cn.lnd.ibatis.mapping.StatementType.PREPARED;
+            cn.lnd.ibatis.mapping.ResultSetType resultSetType = null;
+            cn.lnd.ibatis.mapping.SqlCommandType sqlCommandType = getSqlCommandType(method);
+            boolean isSelect = sqlCommandType == cn.lnd.ibatis.mapping.SqlCommandType.SELECT;
             boolean flushCache = !isSelect;
             boolean useCache = isSelect;
 
-            KeyGenerator keyGenerator;
-            String keyProperty = "id";
+            cn.lnd.ibatis.executor.keygen.KeyGenerator keyGenerator;
+            String keyProperty = null;
             String keyColumn = null;
-            if (SqlCommandType.INSERT.equals(sqlCommandType) || SqlCommandType.UPDATE.equals(sqlCommandType)) {
+            if (cn.lnd.ibatis.mapping.SqlCommandType.INSERT.equals(sqlCommandType) || cn.lnd.ibatis.mapping.SqlCommandType.UPDATE.equals(sqlCommandType)) {
                 // first check for SelectKey annotation - that overrides everything else
                 SelectKey selectKey = method.getAnnotation(SelectKey.class);
                 if (selectKey != null) {
                     keyGenerator = handleSelectKeyAnnotation(selectKey, mappedStatementId, getParameterType(method), languageDriver);
                     keyProperty = selectKey.keyProperty();
                 } else if (options == null) {
-                    keyGenerator = configuration.isUseGeneratedKeys() ? new Jdbc3KeyGenerator() : new NoKeyGenerator();
+                    keyGenerator = configuration.isUseGeneratedKeys() ? cn.lnd.ibatis.executor.keygen.Jdbc3KeyGenerator.INSTANCE : cn.lnd.ibatis.executor.keygen.NoKeyGenerator.INSTANCE;
                 } else {
-                    keyGenerator = options.useGeneratedKeys() ? new Jdbc3KeyGenerator() : new NoKeyGenerator();
+                    keyGenerator = options.useGeneratedKeys() ? Jdbc3KeyGenerator.INSTANCE : cn.lnd.ibatis.executor.keygen.NoKeyGenerator.INSTANCE;
                     keyProperty = options.keyProperty();
                     keyColumn = options.keyColumn();
                 }
             } else {
-                keyGenerator = new NoKeyGenerator();
+                keyGenerator = cn.lnd.ibatis.executor.keygen.NoKeyGenerator.INSTANCE;
             }
 
             if (options != null) {
@@ -320,9 +334,9 @@ public class MapperAnnotationBuilder {
         }
     }
 
-    private LanguageDriver getLanguageDriver(Method method) {
+    private cn.lnd.ibatis.scripting.LanguageDriver getLanguageDriver(Method method) {
         Lang lang = method.getAnnotation(Lang.class);
-        Class<?> langClass = null;
+        Class<? extends cn.lnd.ibatis.scripting.LanguageDriver> langClass = null;
         if (lang != null) {
             langClass = lang.value();
         }
@@ -390,13 +404,19 @@ public class MapperAnnotationBuilder {
                         returnType = (Class<?>) ((ParameterizedType) returnTypeParameter).getRawType();
                     }
                 }
+            } else if (Optional.class.equals(rawType)) {
+                Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+                Type returnTypeParameter = actualTypeArguments[0];
+                if (returnTypeParameter instanceof Class<?>) {
+                    returnType = (Class<?>) returnTypeParameter;
+                }
             }
         }
 
         return returnType;
     }
 
-    private SqlSource getSqlSourceFromAnnotations(Method method, Class<?> parameterType, LanguageDriver languageDriver) {
+    private cn.lnd.ibatis.mapping.SqlSource getSqlSourceFromAnnotations(Method method, Class<?> parameterType, cn.lnd.ibatis.scripting.LanguageDriver languageDriver) {
         try {
             Class<? extends Annotation> sqlAnnotationType = getSqlAnnotationType(method);
             Class<? extends Annotation> sqlProviderAnnotationType = getSqlProviderAnnotationType(method);
@@ -409,15 +429,15 @@ public class MapperAnnotationBuilder {
                 return buildSqlSourceFromStrings(strings, parameterType, languageDriver);
             } else if (sqlProviderAnnotationType != null) {
                 Annotation sqlProviderAnnotation = method.getAnnotation(sqlProviderAnnotationType);
-                return new ProviderSqlSource(assistant.getConfiguration(), sqlProviderAnnotation);
+                return new ProviderSqlSource(assistant.getConfiguration(), sqlProviderAnnotation, type, method);
             }
             return null;
         } catch (Exception e) {
-            throw new BuilderException("Could not find value method on SQL annotation.  Cause: " + e, e);
+            throw new cn.lnd.ibatis.builder.BuilderException("Could not find value method on SQL annotation.  Cause: " + e, e);
         }
     }
 
-    private SqlSource buildSqlSourceFromStrings(String[] strings, Class<?> parameterTypeClass, LanguageDriver languageDriver) {
+    private cn.lnd.ibatis.mapping.SqlSource buildSqlSourceFromStrings(String[] strings, Class<?> parameterTypeClass, cn.lnd.ibatis.scripting.LanguageDriver languageDriver) {
         final StringBuilder sql = new StringBuilder();
         for (String fragment : strings) {
             sql.append(fragment);
@@ -426,14 +446,14 @@ public class MapperAnnotationBuilder {
         return languageDriver.createSqlSource(configuration, sql.toString().trim(), parameterTypeClass);
     }
 
-    private SqlCommandType getSqlCommandType(Method method) {
+    private cn.lnd.ibatis.mapping.SqlCommandType getSqlCommandType(Method method) {
         Class<? extends Annotation> type = getSqlAnnotationType(method);
 
         if (type == null) {
             type = getSqlProviderAnnotationType(method);
 
             if (type == null) {
-                return SqlCommandType.UNKNOWN;
+                return cn.lnd.ibatis.mapping.SqlCommandType.UNKNOWN;
             }
 
             if (type == SelectProvider.class) {
@@ -447,15 +467,15 @@ public class MapperAnnotationBuilder {
             }
         }
 
-        return SqlCommandType.valueOf(type.getSimpleName().toUpperCase(Locale.ENGLISH));
+        return cn.lnd.ibatis.mapping.SqlCommandType.valueOf(type.getSimpleName().toUpperCase(Locale.ENGLISH));
     }
 
     private Class<? extends Annotation> getSqlAnnotationType(Method method) {
-        return chooseAnnotationType(method, sqlAnnotationTypes);
+        return chooseAnnotationType(method, SQL_ANNOTATION_TYPES);
     }
 
     private Class<? extends Annotation> getSqlProviderAnnotationType(Method method) {
-        return chooseAnnotationType(method, sqlProviderAnnotationTypes);
+        return chooseAnnotationType(method, SQL_PROVIDER_ANNOTATION_TYPES);
     }
 
     private Class<? extends Annotation> chooseAnnotationType(Method method, Set<Class<? extends Annotation>> types) {
@@ -468,21 +488,21 @@ public class MapperAnnotationBuilder {
         return null;
     }
 
-    private void applyResults(Result[] results, Class<?> resultType, List<ResultMapping> resultMappings) {
+    private void applyResults(Result[] results, Class<?> resultType, List<cn.lnd.ibatis.mapping.ResultMapping> resultMappings) {
         for (Result result : results) {
-            List<ResultFlag> flags = new ArrayList<ResultFlag>();
+            List<cn.lnd.ibatis.mapping.ResultFlag> flags = new ArrayList<>();
             if (result.id()) {
-                flags.add(ResultFlag.ID);
+                flags.add(cn.lnd.ibatis.mapping.ResultFlag.ID);
             }
             @SuppressWarnings("unchecked")
-            Class<? extends TypeHandler<?>> typeHandler = (Class<? extends TypeHandler<?>>)
-                    ((result.typeHandler() == UnknownTypeHandler.class) ? null : result.typeHandler());
-            ResultMapping resultMapping = assistant.buildResultMapping(
+            Class<? extends cn.lnd.ibatis.type.TypeHandler<?>> typeHandler = (Class<? extends cn.lnd.ibatis.type.TypeHandler<?>>)
+                    ((result.typeHandler() == cn.lnd.ibatis.type.UnknownTypeHandler.class) ? null : result.typeHandler());
+            cn.lnd.ibatis.mapping.ResultMapping resultMapping = assistant.buildResultMapping(
                     resultType,
                     nullOrEmpty(result.property()),
                     nullOrEmpty(result.column()),
                     result.javaType() == void.class ? null : result.javaType(),
-                    result.jdbcType() == JdbcType.UNDEFINED ? null : result.jdbcType(),
+                    result.jdbcType() == cn.lnd.ibatis.type.JdbcType.UNDEFINED ? null : result.jdbcType(),
                     hasNestedSelect(result) ? nestedSelectId(result) : null,
                     null,
                     null,
@@ -509,10 +529,10 @@ public class MapperAnnotationBuilder {
 
     private boolean isLazy(Result result) {
         boolean isLazy = configuration.isLazyLoadingEnabled();
-        if (!result.one().select().isEmpty() && FetchType.DEFAULT != result.one().fetchType()) {
-            isLazy = (result.one().fetchType() == FetchType.LAZY);
-        } else if (!result.many().select().isEmpty() && FetchType.DEFAULT != result.many().fetchType()) {
-            isLazy = (result.many().fetchType() == FetchType.LAZY);
+        if (result.one().select().length() > 0 && cn.lnd.ibatis.mapping.FetchType.DEFAULT != result.one().fetchType()) {
+            isLazy = result.one().fetchType() == cn.lnd.ibatis.mapping.FetchType.LAZY;
+        } else if (result.many().select().length() > 0 && cn.lnd.ibatis.mapping.FetchType.DEFAULT != result.many().fetchType()) {
+            isLazy = result.many().fetchType() == cn.lnd.ibatis.mapping.FetchType.LAZY;
         }
         return isLazy;
     }
@@ -524,26 +544,26 @@ public class MapperAnnotationBuilder {
         return result.one().select().length() > 0 || result.many().select().length() > 0;
     }
 
-    private void applyConstructorArgs(Arg[] args, Class<?> resultType, List<ResultMapping> resultMappings) {
+    private void applyConstructorArgs(Arg[] args, Class<?> resultType, List<cn.lnd.ibatis.mapping.ResultMapping> resultMappings) {
         for (Arg arg : args) {
-            List<ResultFlag> flags = new ArrayList<ResultFlag>();
-            flags.add(ResultFlag.CONSTRUCTOR);
+            List<cn.lnd.ibatis.mapping.ResultFlag> flags = new ArrayList<>();
+            flags.add(cn.lnd.ibatis.mapping.ResultFlag.CONSTRUCTOR);
             if (arg.id()) {
-                flags.add(ResultFlag.ID);
+                flags.add(cn.lnd.ibatis.mapping.ResultFlag.ID);
             }
             @SuppressWarnings("unchecked")
-            Class<? extends TypeHandler<?>> typeHandler = (Class<? extends TypeHandler<?>>)
+            Class<? extends cn.lnd.ibatis.type.TypeHandler<?>> typeHandler = (Class<? extends TypeHandler<?>>)
                     (arg.typeHandler() == UnknownTypeHandler.class ? null : arg.typeHandler());
-            ResultMapping resultMapping = assistant.buildResultMapping(
+            cn.lnd.ibatis.mapping.ResultMapping resultMapping = assistant.buildResultMapping(
                     resultType,
-                    null,
+                    nullOrEmpty(arg.name()),
                     nullOrEmpty(arg.column()),
                     arg.javaType() == void.class ? null : arg.javaType(),
                     arg.jdbcType() == JdbcType.UNDEFINED ? null : arg.jdbcType(),
                     nullOrEmpty(arg.select()),
                     nullOrEmpty(arg.resultMap()),
                     null,
-                    null,
+                    nullOrEmpty(arg.columnPrefix()),
                     typeHandler,
                     flags,
                     null,
@@ -565,26 +585,26 @@ public class MapperAnnotationBuilder {
         return args == null ? new Arg[0] : args.value();
     }
 
-    private KeyGenerator handleSelectKeyAnnotation(SelectKey selectKeyAnnotation, String baseStatementId, Class<?> parameterTypeClass, LanguageDriver languageDriver) {
-        String id = baseStatementId + SelectKeyGenerator.SELECT_KEY_SUFFIX;
+    private cn.lnd.ibatis.executor.keygen.KeyGenerator handleSelectKeyAnnotation(SelectKey selectKeyAnnotation, String baseStatementId, Class<?> parameterTypeClass, LanguageDriver languageDriver) {
+        String id = baseStatementId + cn.lnd.ibatis.executor.keygen.SelectKeyGenerator.SELECT_KEY_SUFFIX;
         Class<?> resultTypeClass = selectKeyAnnotation.resultType();
-        StatementType statementType = selectKeyAnnotation.statementType();
+        cn.lnd.ibatis.mapping.StatementType statementType = selectKeyAnnotation.statementType();
         String keyProperty = selectKeyAnnotation.keyProperty();
         String keyColumn = selectKeyAnnotation.keyColumn();
         boolean executeBefore = selectKeyAnnotation.before();
 
         // defaults
         boolean useCache = false;
-        KeyGenerator keyGenerator = new NoKeyGenerator();
+        KeyGenerator keyGenerator = NoKeyGenerator.INSTANCE;
         Integer fetchSize = null;
         Integer timeout = null;
         boolean flushCache = false;
         String parameterMap = null;
         String resultMap = null;
-        ResultSetType resultSetTypeEnum = null;
+        cn.lnd.ibatis.mapping.ResultSetType resultSetTypeEnum = null;
 
-        SqlSource sqlSource = buildSqlSourceFromStrings(selectKeyAnnotation.statement(), parameterTypeClass, languageDriver);
-        SqlCommandType sqlCommandType = SqlCommandType.SELECT;
+        cn.lnd.ibatis.mapping.SqlSource sqlSource = buildSqlSourceFromStrings(selectKeyAnnotation.statement(), parameterTypeClass, languageDriver);
+        cn.lnd.ibatis.mapping.SqlCommandType sqlCommandType = cn.lnd.ibatis.mapping.SqlCommandType.SELECT;
 
         assistant.addMappedStatement(id, sqlSource, statementType, sqlCommandType, fetchSize, timeout, parameterMap, parameterTypeClass, resultMap, resultTypeClass, resultSetTypeEnum,
                 flushCache, useCache, false,
@@ -593,7 +613,7 @@ public class MapperAnnotationBuilder {
         id = assistant.applyCurrentNamespace(id, false);
 
         MappedStatement keyStatement = configuration.getMappedStatement(id, false);
-        SelectKeyGenerator answer = new SelectKeyGenerator(keyStatement, executeBefore);
+        cn.lnd.ibatis.executor.keygen.SelectKeyGenerator answer = new SelectKeyGenerator(keyStatement, executeBefore);
         configuration.addKeyGenerator(id, answer);
         return answer;
     }

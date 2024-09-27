@@ -1,4 +1,4 @@
-package cn.lnd.example.http;
+package cn.lnd.test.http;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;

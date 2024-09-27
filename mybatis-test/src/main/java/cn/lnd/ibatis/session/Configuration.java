@@ -56,7 +56,6 @@ import cn.lnd.ibatis.type.JdbcType;
 import cn.lnd.ibatis.type.TypeAliasRegistry;
 import cn.lnd.ibatis.type.TypeHandlerRegistry;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.*;
 
@@ -112,7 +111,7 @@ public class Configuration {
     @Getter
     protected Integer defaultFetchSize;
     @Getter
-    protected cn.lnd.ibatis.session.ExecutorType defaultExecutorType = cn.lnd.ibatis.session.ExecutorType.SIMPLE;
+    protected ExecutorType defaultExecutorType = ExecutorType.SIMPLE;
     @Getter
     protected AutoMappingBehavior autoMappingBehavior = AutoMappingBehavior.PARTIAL;
     /**
@@ -154,30 +153,46 @@ public class Configuration {
     protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry();
     @Getter
     protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
+
+    /* LanguageDriver 注册表 */
     @Getter
     protected final LanguageDriverRegistry languageRegistry = new LanguageDriverRegistry();
 
-    protected final Map<String, MappedStatement> mappedStatements = new cn.lnd.ibatis.session.Configuration.StrictMap<>("Mapped Statements collection");
-    protected final Map<String, Cache> caches = new cn.lnd.ibatis.session.Configuration.StrictMap<>("Caches collection");
-    protected final Map<String, ResultMap> resultMaps = new cn.lnd.ibatis.session.Configuration.StrictMap<>("Result Maps collection");
-    protected final Map<String, ParameterMap> parameterMaps = new cn.lnd.ibatis.session.Configuration.StrictMap<>("Parameter Maps collection");
-    protected final Map<String, KeyGenerator> keyGenerators = new cn.lnd.ibatis.session.Configuration.StrictMap<>("Key Generators collection");
+    protected final Map<String, MappedStatement> mappedStatements = new Configuration.StrictMap<>("Mapped Statements collection");
 
-    protected final Set<String> loadedResources = new HashSet<String>();
+    /**
+     * Cache 对象集合
+     * KEY：命名空间 namespace
+     */
+    protected final Map<String, Cache> caches = new Configuration.StrictMap<>("Caches collection");
+    protected final Map<String, ResultMap> resultMaps = new Configuration.StrictMap<>("Result Maps collection");
+    protected final Map<String, ParameterMap> parameterMaps = new Configuration.StrictMap<>("Parameter Maps collection");
+    protected final Map<String, KeyGenerator> keyGenerators = new Configuration.StrictMap<>("Key Generators collection");
+
+    /* 已加载资源( Resource )集合 */
+    protected final Set<String> loadedResources = new HashSet<>();
     @Getter
-    protected final Map<String, XNode> sqlFragments = new cn.lnd.ibatis.session.Configuration.StrictMap<XNode>("XML fragments parsed from previous mappers");
+    protected final Map<String, XNode> sqlFragments = new Configuration.StrictMap<>("XML fragments parsed from previous mappers");
 
-    protected final Collection<XMLStatementBuilder> incompleteStatements = new LinkedList<XMLStatementBuilder>();
-    protected final Collection<CacheRefResolver> incompleteCacheRefs = new LinkedList<CacheRefResolver>();
-    protected final Collection<ResultMapResolver> incompleteResultMaps = new LinkedList<ResultMapResolver>();
-    protected final Collection<MethodResolver> incompleteMethods = new LinkedList<MethodResolver>();
+    @Getter
+    protected final Collection<XMLStatementBuilder> incompleteStatements = new LinkedList<>();
+
+    @Getter
+    /* CacheRefResolver 集合 */
+    protected final Collection<CacheRefResolver> incompleteCacheRefs = new LinkedList<>();
+    @Getter
+    protected final Collection<ResultMapResolver> incompleteResultMaps = new LinkedList<>();
+    @Getter
+    protected final Collection<MethodResolver> incompleteMethods = new LinkedList<>();
 
     /*
      * A map holds cache-ref relationship. The key is the namespace that
      * references a cache bound to another namespace and the value is the
      * namespace which the actual cache is bound to.
+     *
+     * Cache 指向的映射
      */
-    protected final Map<String, String> cacheRefMap = new HashMap<String, String>();
+    protected final Map<String, String> cacheRefMap = new HashMap<>();
 
     public Configuration(Environment environment) {
         this();
@@ -214,7 +229,9 @@ public class Configuration {
         typeAliasRegistry.registerAlias("CGLIB", CglibProxyFactory.class);
         typeAliasRegistry.registerAlias("JAVASSIST", JavassistProxyFactory.class);
 
+        // 注册默认的 LanguageDriver 实例
         languageRegistry.setDefaultDriverClass(XMLLanguageDriver.class);
+        // 注册 LanguageDriver 实例
         languageRegistry.register(RawLanguageDriver.class);
     }
 
@@ -324,7 +341,7 @@ public class Configuration {
         this.useGeneratedKeys = useGeneratedKeys;
     }
 
-    public void setDefaultExecutorType(cn.lnd.ibatis.session.ExecutorType defaultExecutorType) {
+    public void setDefaultExecutorType(ExecutorType defaultExecutorType) {
         this.defaultExecutorType = defaultExecutorType;
     }
 
@@ -382,7 +399,7 @@ public class Configuration {
         return interceptorChain.getInterceptors();
     }
 
-    public void setDefaultScriptingLanguage(Class<?> driver) {
+    public void setDefaultScriptingLanguage(Class<? extends LanguageDriver> driver) {
         if (driver == null) {
             driver = XMLLanguageDriver.class;
         }
@@ -426,11 +443,11 @@ public class Configuration {
         return newExecutor(transaction, defaultExecutorType);
     }
 
-    public Executor newExecutor(Transaction transaction, cn.lnd.ibatis.session.ExecutorType executorType) {
+    public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
         executorType = executorType == null ? defaultExecutorType : executorType;
-        executorType = executorType == null ? cn.lnd.ibatis.session.ExecutorType.SIMPLE : executorType;
+        executorType = executorType == null ? ExecutorType.SIMPLE : executorType;
         Executor executor;
-        if (cn.lnd.ibatis.session.ExecutorType.BATCH == executorType) {
+        if (ExecutorType.BATCH == executorType) {
             executor = new BatchExecutor(this, transaction);
         } else if (ExecutorType.REUSE == executorType) {
             executor = new ReuseExecutor(this, transaction);
@@ -540,24 +557,12 @@ public class Configuration {
         return mappedStatements.values();
     }
 
-    public Collection<XMLStatementBuilder> getIncompleteStatements() {
-        return incompleteStatements;
-    }
-
     public void addIncompleteStatement(XMLStatementBuilder incompleteStatement) {
         incompleteStatements.add(incompleteStatement);
     }
 
-    public Collection<CacheRefResolver> getIncompleteCacheRefs() {
-        return incompleteCacheRefs;
-    }
-
     public void addIncompleteCacheRef(CacheRefResolver incompleteCacheRef) {
         incompleteCacheRefs.add(incompleteCacheRef);
-    }
-
-    public Collection<ResultMapResolver> getIncompleteResultMaps() {
-        return incompleteResultMaps;
     }
 
     public void addIncompleteResultMap(ResultMapResolver resultMapResolver) {
@@ -566,10 +571,6 @@ public class Configuration {
 
     public void addIncompleteMethod(MethodResolver builder) {
         incompleteMethods.add(builder);
-    }
-
-    public Collection<MethodResolver> getIncompleteMethods() {
-        return incompleteMethods;
     }
 
     public MappedStatement getMappedStatement(String id) {
@@ -735,7 +736,7 @@ public class Configuration {
                 if (super.get(shortKey) == null) {
                     super.put(shortKey, value);
                 } else {
-                    super.put(shortKey, (V) new cn.lnd.ibatis.session.Configuration.StrictMap.Ambiguity(shortKey));
+                    super.put(shortKey, (V) new Configuration.StrictMap.Ambiguity(shortKey));
                 }
             }
             return super.put(key, value);
@@ -746,8 +747,8 @@ public class Configuration {
             if (value == null) {
                 throw new IllegalArgumentException(name + " does not contain value for " + key);
             }
-            if (value instanceof cn.lnd.ibatis.session.Configuration.StrictMap.Ambiguity) {
-                throw new IllegalArgumentException(((cn.lnd.ibatis.session.Configuration.StrictMap.Ambiguity) value).getSubject() + " is ambiguous in " + name
+            if (value instanceof Configuration.StrictMap.Ambiguity) {
+                throw new IllegalArgumentException(((Configuration.StrictMap.Ambiguity) value).getSubject() + " is ambiguous in " + name
                         + " (try using the full name including the namespace, or rename one of the entries)");
             }
             return value;

@@ -1,6 +1,6 @@
 package cn.lnd.ibatis.scripting.xmltags;
 
-import cn.lnd.iba1tis.session.Configuration;
+import cn.lnd.ibatis.session.Configuration;
 
 import java.util.Arrays;
 import java.util.List;

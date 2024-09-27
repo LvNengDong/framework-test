@@ -11,16 +11,18 @@ import cn.lnd.ibatis.scripting.LanguageDriver;
 import cn.lnd.ibatis.session.Configuration;
 import cn.lnd.ibatis.type.JdbcType;
 import cn.lnd.ibatis.type.TypeHandler;
+import lombok.Getter;
 
 import java.util.*;
 
 /**
  * @Author lnd
- * @Description
+ * @Description     是 XMLMapperBuilder 和 MapperAnnotationBuilder 的小助手，提供了一些公用的方法，例如创建 ParameterMap、MappedStatement 对象等等
  * @Date 2024/9/19 15:20
  */
 public class MapperBuilderAssistant extends BaseBuilder {
 
+    @Getter
     private String currentNamespace;
     private String resource;
     private Cache currentCache;
@@ -32,17 +34,13 @@ public class MapperBuilderAssistant extends BaseBuilder {
         this.resource = resource;
     }
 
-    public String getCurrentNamespace() {
-        return currentNamespace;
-    }
-
     public void setCurrentNamespace(String currentNamespace) {
         if (currentNamespace == null) {
-            throw new cn.lnd.ibatis.builder.BuilderException("The mapper element requires a namespace attribute to be specified.");
+            throw new BuilderException("The mapper element requires a namespace attribute to be specified.");
         }
 
         if (this.currentNamespace != null && !this.currentNamespace.equals(currentNamespace)) {
-            throw new cn.lnd.ibatis.builder.BuilderException("Wrong namespace. Expected '"
+            throw new BuilderException("Wrong namespace. Expected '"
                     + this.currentNamespace + "' but found '" + currentNamespace + "'.");
         }
 
@@ -64,30 +62,39 @@ public class MapperBuilderAssistant extends BaseBuilder {
                 return base;
             }
             if (base.contains(".")) {
-                throw new cn.lnd.ibatis.builder.BuilderException("Dots are not allowed in element names, please remove it from " + base);
+                throw new BuilderException("Dots are not allowed in element names, please remove it from " + base);
             }
         }
         return currentNamespace + "." + base;
     }
 
+    /**
+     * 获得 namespace 对应的 Cache 对象。如果获得不到，则抛出 IncompleteElementException 异常
+     * */
     public Cache useCacheRef(String namespace) {
         if (namespace == null) {
             throw new BuilderException("cache-ref element requires a namespace attribute.");
         }
         try {
-            unresolvedCacheRef = true;
+            unresolvedCacheRef = true; // 标记未解决
+            // <1> 获得 Cache 对象
             Cache cache = configuration.getCache(namespace);
+            // 获得不到，抛出 IncompleteElementException 异常
             if (cache == null) {
                 throw new IncompleteElementException("No cache for namespace '" + namespace + "' could be found.");
             }
+            // 记录当前 Cache 对象
             currentCache = cache;
-            unresolvedCacheRef = false;
+            unresolvedCacheRef = false; // 标记已解决
             return cache;
         } catch (IllegalArgumentException e) {
             throw new IncompleteElementException("No cache for namespace '" + namespace + "' could be found.", e);
         }
     }
 
+    /**
+     * 创建 Cache 对象
+     * */
     public Cache useNewCache(Class<? extends Cache> typeClass,
                              Class<? extends Cache> evictionClass,
                              Long flushInterval,
@@ -442,12 +449,17 @@ public class MapperBuilderAssistant extends BaseBuilder {
                 nestedResultMap, notNullColumn, columnPrefix, typeHandler, flags, null, null, configuration.isLazyLoadingEnabled());
     }
 
-    public LanguageDriver getLanguageDriver(Class<?> langClass) {
+    /**
+     * Class<? extends LanguageDriver>*/
+    public LanguageDriver getLanguageDriver(Class<? extends LanguageDriver> langClass) {
         if (langClass != null) {
+            // 尝试根据 langClass 类注册 LanguageDriver 对象
             configuration.getLanguageRegistry().register(langClass);
         } else {
+            // 如果为空，则使用默认 LanguageDriver 对象
             langClass = configuration.getLanguageRegistry().getDefaultDriverClass();
         }
+        // 使用注册成功的 LanguageDriver 对象
         return configuration.getLanguageRegistry().getDriver(langClass);
     }
 

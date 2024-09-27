@@ -1,45 +1,54 @@
 package cn.lnd.ibatis.scripting;
 
+
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @Author lnd
  * @Description
+ *  
+ *  LanguageDriver 注册表
+ * 
  * @Date 2024/9/20 21:05
  */
 public class LanguageDriverRegistry {
 
-    private final Map<Class<?>, cn.lnd.ibatis.scripting.LanguageDriver> LANGUAGE_DRIVER_MAP = new HashMap<Class<?>, cn.lnd.ibatis.scripting.LanguageDriver>();
+    /* LanguageDriver 映射 */
+    private final Map<Class<?>, LanguageDriver> LANGUAGE_DRIVER_MAP = new HashMap<>();
 
-    private Class<?> defaultDriverClass;
+    /* 默认的 LanguageDriver 类 */
+    @Getter
+    private Class<? extends LanguageDriver> defaultDriverClass;
 
-    public void register(Class<?> cls) {
+    public void register(Class<? extends LanguageDriver> cls) {
         if (cls == null) {
             throw new IllegalArgumentException("null is not a valid Language Driver");
         }
-        cn.lnd.ibatis.scripting.LanguageDriver driver = LANGUAGE_DRIVER_MAP.get(cls);
-        if (driver == null) {
+        // 创建 cls 对应的对象，并添加到 LANGUAGE_DRIVER_MAP 中
+        if (!LANGUAGE_DRIVER_MAP.containsKey(cls)) {
             try {
-                driver = (cn.lnd.ibatis.scripting.LanguageDriver) cls.newInstance();
-                LANGUAGE_DRIVER_MAP.put(cls, driver);
+                LANGUAGE_DRIVER_MAP.put(cls, cls.newInstance());
             } catch (Exception ex) {
                 throw new ScriptingException("Failed to load language driver for " + cls.getName(), ex);
             }
         }
     }
 
-    public void register(cn.lnd.ibatis.scripting.LanguageDriver instance) {
+    public void register(LanguageDriver instance) {
         if (instance == null) {
             throw new IllegalArgumentException("null is not a valid Language Driver");
         }
-        cn.lnd.ibatis.scripting.LanguageDriver driver = LANGUAGE_DRIVER_MAP.get(instance.getClass());
-        if (driver == null) {
-            LANGUAGE_DRIVER_MAP.put(instance.getClass(), driver);
+        // 添加到 LANGUAGE_DRIVER_MAP 中
+        Class<? extends LanguageDriver> cls = instance.getClass();
+        if (!LANGUAGE_DRIVER_MAP.containsKey(cls)) {
+            LANGUAGE_DRIVER_MAP.put(cls, instance);
         }
     }
 
-    public cn.lnd.ibatis.scripting.LanguageDriver getDriver(Class<?> cls) {
+    public LanguageDriver getDriver(Class<? extends LanguageDriver> cls) {
         return LANGUAGE_DRIVER_MAP.get(cls);
     }
 
@@ -47,11 +56,12 @@ public class LanguageDriverRegistry {
         return getDriver(getDefaultDriverClass());
     }
 
-    public Class<?> getDefaultDriverClass() {
-        return defaultDriverClass;
-    }
-
-    public void setDefaultDriverClass(Class<?> defaultDriverClass) {
+    /**
+     * 设置 {@link #defaultDriverClass}
+     *
+     * @param defaultDriverClass 默认的 LanguageDriver 类
+     */
+    public void setDefaultDriverClass(Class<? extends LanguageDriver> defaultDriverClass) {
         register(defaultDriverClass);
         this.defaultDriverClass = defaultDriverClass;
     }

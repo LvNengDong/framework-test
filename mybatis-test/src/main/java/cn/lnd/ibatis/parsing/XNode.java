@@ -1,5 +1,6 @@
 package cn.lnd.ibatis.parsing;
 
+import lombok.Getter;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.*;
 
@@ -15,7 +16,9 @@ import java.util.Properties;
  */
 public class XNode {
 
+    @Getter
     private Node node;
+    @Getter
     private String name;
     private String body;
     private Properties attributes;
@@ -98,14 +101,6 @@ public class XNode {
 
     public XNode evalNode(String expression) {
         return xpathParser.evalNode(node, expression);
-    }
-
-    public Node getNode() {
-        return node;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getStringBody() {
