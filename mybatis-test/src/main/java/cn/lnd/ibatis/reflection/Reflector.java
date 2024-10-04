@@ -48,7 +48,7 @@ public class Reflector {
     }
 
     private void addDefaultConstructor(Class<?> clazz) {
-        Constructor<?>[] consts = clazz.getDeclaredConstructors(); // 获取构造函数，包含私有构造函数
+        Constructor<?>[] consts = clazz.getDeclaredConstructors(); // 获取构造函数，
         for (Constructor<?> constructor : consts) {
             if (constructor.getParameterTypes().length == 0) { // 构造函数参数长度为0
                 // 设置构造方法可以访问，避免是private等修饰符导致无法创建出实例对象
